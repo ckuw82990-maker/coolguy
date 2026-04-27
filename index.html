@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Gaming Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+        :root { --accent: #8b5cf6; --bg-dark: #020617; }
+        body { background-color: var(--bg-dark); color: white; font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; height: 100vh; }
+        .heading-font { font-family: 'Orbitron', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        #proxy-ui { display: none; position: fixed; inset: 0; z-index: 100; background: #000; flex-direction: column; }
+        .proxy-active #proxy-ui { display: flex; }
+        canvas { display: block; width: 100%; height: 100%; background: #000; cursor: crosshair; }
+        .game-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    </style>
+</head>
+<body class="overflow-y-auto">
+
+    <!-- STEALTH LAUNCHER -->
+    <div id="launcher-screen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center text-center p-6 transition-transform duration-700">
+        <div class="w-20 h-20 bg-violet-600 rounded-2xl mb-6 flex items-center justify-center heading-font font-bold text-4xl shadow-2xl shadow-violet-500/50">N</div>
+        <h1 class="text-4xl font-black heading-font mb-2">NEXUS HUB</h1>
+        <div class="flex flex-col sm:flex-row gap-4 mt-8">
+            <button onclick="launchAboutBlank()" class="bg-violet-600 hover:bg-violet-500 px-8 py-4 rounded-full font-bold transition">Launch Stealth Mode</button>
+            <button onclick="enterRegular()" class="text-slate-500 hover:text-white transition py-4">Continue in tab</button>
+        </div>
+    </div>
+
+    <!-- PROXY OVERLAY -->
+    <div id="proxy-ui">
+        <div class="p-3 glass flex items-center gap-4">
+            <button onclick="closeProxy()" class="bg-red-500/20 text-red-400 p-2 px-4 rounded-lg">Exit</button>
+            <input type="text" id="proxy-input" placeholder="https://..." class="flex-1 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-white outline-none">
+            <button onclick="launchProxy()" class="bg-violet-600 px-6 py-2 rounded-lg font-bold">Go</button>
+        </div>
+        <div class="flex-1 bg-white"><iframe id="proxy-frame" src="" class="w-full h-full border-none"></iframe></div>
+    </div>
+
+    <!-- MAIN NAV -->
+    <nav class="fixed top-0 w-full z-50 glass px-8 py-4 flex justify-between items-center">
+        <span class="text-lg font-bold heading-font italic">NEXUS<span class="text-violet-500">HUB</span></span>
+        <div class="flex items-center gap-6">
+            <div id="user-display" class="hidden items-center gap-4">
+                <p id="nav-username" class="text-sm font-bold text-violet-400"></p>
+                <button onclick="signOut()" class="text-[10px] text-slate-500 uppercase tracking-widest">Sign Out</button>
+            </div>
+            <button id="login-trigger" onclick="openAuthModal()" class="bg-white text-black px-4 py-1.5 rounded-full text-xs font-bold hover:bg-violet-500 hover:text-white transition">Account</button>
+        </div>
+    </nav>
+
+    <main class="pt-28 pb-20 px-6 container mx-auto max-w-6xl">
+        <div class="grid lg:grid-cols-4 gap-8">
+            
+            <div class="lg:col-span-3 space-y-8">
+                <!-- GAME VIEWPORT -->
+                <div class="relative rounded-3xl overflow-hidden border border-white/10 aspect-video bg-black shadow-2xl">
+                    <div id="game-overlay" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-950/90 text-center p-6">
+                        <h2 id="overlay-title" class="text-4xl font-black heading-font mb-2">NEON STRIKE</h2>
+                        <p id="overlay-desc" class="text-slate-400 mb-6 italic">Select a game below to begin</p>
+                        <button id="main-play-btn" class="bg-violet-600 px-12 py-4 rounded-full font-black heading-font tracking-widest hover:bg-violet-500 transition hidden">COMMENCE</button>
+                    </div>
+                    <!-- Score HUD -->
+                    <div id="score-hud" class="absolute top-4 left-4 z-10 hidden glass p-2 px-4 rounded-lg pointer-events-none">
+                        <span class="text-xs text-slate-400">SCORE: </span><span id="score-text" class="font-bold heading-font">0</span>
+                    </div>
+                    <canvas id="gameCanvas"></canvas>
+                </div>
+
+                <!-- GAME LIBRARY -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div onclick="prepareGame('neon')" class="game-card glass p-4 rounded-2xl cursor-pointer transition-all border border-transparent">
+                        <div class="h-24 bg-gradient-to-br from-violet-600 to-indigo-900 rounded-xl mb-3 flex items-center justify-center font-bold text-xs heading-font">NEON STRIKE</div>
+                        <h4 class="font-bold text-sm">Neon Strike</h4>
+                    </div>
+                    <div onclick="prepareGame('runner')" class="game-card glass p-4 rounded-2xl cursor-pointer transition-all border border-transparent">
+                        <div class="h-24 bg-gradient-to-br from-emerald-600 to-teal-900 rounded-xl mb-3 flex items-center justify-center font-bold text-xs heading-font">VOID RUNNER</div>
+                        <h4 class="font-bold text-sm">Void Runner</h4>
+                    </div>
+                    <div onclick="openProxy()" class="game-card glass p-4 rounded-2xl cursor-pointer transition-all border border-transparent">
+                        <div class="h-24 bg-slate-800 rounded-xl mb-3 flex items-center justify-center text-violet-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+                        </div>
+                        <h4 class="font-bold text-sm">Proxy</h4>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SIDEBAR -->
+            <div class="glass p-6 rounded-3xl h-fit space-y-6">
+                <h3 class="heading-font text-[10px] tracking-widest text-violet-400 uppercase">Profile Cloud</h3>
+                <div id="recent-scores" class="text-sm space-y-2"></div>
+                <div class="pt-4 border-t border-white/10 flex flex-col gap-3">
+                    <button onclick="exportData()" class="text-[10px] uppercase font-bold text-slate-500 hover:text-white">Export .nexus</button>
+                    <label class="text-[10px] uppercase font-bold text-slate-500 hover:text-white cursor-pointer">
+                        Import Data
+                        <input type="file" id="import-file" class="hidden" onchange="importData(event)">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AUTH -->
+    <div id="auth-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+        <div class="glass max-w-sm w-full p-8 rounded-3xl">
+            <h2 class="heading-font font-bold mb-4 text-center">CREATE ACCOUNT</h2>
+            <input type="text" id="auth-username" placeholder="Username" class="w-full bg-slate-900 border border-white/10 p-3 rounded-xl mb-4 text-white">
+            <button onclick="handleLogin()" class="w-full bg-violet-600 p-4 rounded-xl font-bold uppercase text-xs">Enter Hub</button>
+        </div>
+    </div>
+
+    <script>
+        /** STEALTH & BOOT **/
+        function enterRegular() { document.getElementById('launcher-screen').style.display = 'none'; }
+        function launchAboutBlank() { 
+            const win = window.open('about:blank', '_blank'); 
+            const doc = win.document;
+            doc.write('<!DOCTYPE html><html>' + document.documentElement.innerHTML + '</html>'); 
+            doc.close(); 
+            window.location.replace("https://www.google.com"); 
+        }
+
+        /** DATA SYSTEM **/
+        let user = JSON.parse(localStorage.getItem('nexus_hub_user')) || null;
+        function updateAccountUI() {
+            document.getElementById('login-trigger').style.display = user ? 'none' : 'block';
+            document.getElementById('user-display').style.display = user ? 'flex' : 'none';
+            if(user) {
+                document.getElementById('nav-username').innerText = user.username.toUpperCase();
+                document.getElementById('recent-scores').innerHTML = `
+                    <div class="flex justify-between"><span>User</span><span class="text-violet-400 font-bold">${user.username}</span></div>
+                    <div class="flex justify-between"><span>Neon</span><span class="text-white">${user.bestNeon || 0}</span></div>
+                    <div class="flex justify-between"><span>Runner</span><span class="text-white">${user.bestRunner || 0}</span></div>
+                `;
+            } else {
+                document.getElementById('recent-scores').innerHTML = `<p class="text-slate-500 italic">No account connected.</p>`;
+            }
+        }
+        function handleLogin() {
+            const name = document.getElementById('auth-username').value;
+            if (name.length < 2) return;
+            user = { username: name, bestNeon: 0, bestRunner: 0 };
+            localStorage.setItem('nexus_hub_user', JSON.stringify(user));
+            document.getElementById('auth-modal').classList.add('hidden');
+            updateAccountUI();
+        }
+        function signOut() { user = null; localStorage.removeItem('nexus_hub_user'); updateAccountUI(); }
+        function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
+        function exportData() {
+            if(!user) return;
+            const blob = new Blob([JSON.stringify(user)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `nexus_${user.username}.nexus`; a.click();
+        }
+        function importData(e) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { user = JSON.parse(ev.target.result); localStorage.setItem('nexus_hub_user', JSON.stringify(user)); updateAccountUI(); };
+            reader.readAsText(e.target.files[0]);
+        }
+
+        /** PROXY **/
+        function openProxy() { document.body.classList.add('proxy-active'); }
+        function closeProxy() { document.body.classList.remove('proxy-active'); }
+        function launchProxy() { document.getElementById('proxy-frame').src = document.getElementById('proxy-input').value; }
+
+        /** GAME ENGINE FIXED **/
+        const canvas = document.getElementById('gameCanvas'); 
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('game-overlay');
+        const playBtn = document.getElementById('main-play-btn');
+        const scoreText = document.getElementById('score-text');
+
+        let isPlaying = false, score = 0, entities = [], player = { x: 0, y: 0, r: 12 }, mouse = { x: 0, y: 0 }, activeGame = '';
+
+        function setCanvasSize() {
+            const rect = canvas.parentNode.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+
+        function prepareGame(game) {
+            activeGame = game;
+            playBtn.classList.remove('hidden');
+            document.getElementById('overlay-title').innerText = game === 'neon' ? "NEON STRIKE" : "VOID RUNNER";
+            document.getElementById('overlay-desc').innerText = game === 'neon' ? "Move mouse to aim. Click to fire." : "Dodge the gray debris.";
+        }
+
+        playBtn.onclick = () => {
+            if(!user) return openAuthModal();
+            setCanvasSize();
+            overlay.classList.add('hidden');
+            document.getElementById('score-hud').classList.remove('hidden');
+            isPlaying = true;
+            score = 0;
+            entities = [];
+            player.x = canvas.width/2;
+            player.y = canvas.height/2;
+            requestAnimationFrame(gameLoop);
+        };
+
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = (e.clientX - rect.left);
+            mouse.y = (e.clientY - rect.top);
+        });
+
+        canvas.addEventListener('mousedown', () => {
+            if(isPlaying && activeGame === 'neon') {
+                const angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+                entities.push({type:'bullet', x:player.x, y:player.y, vx: Math.cos(angle)*7, vy: Math.sin(angle)*7, r:3});
+            }
+        });
+
+        function gameLoop() {
+            if (!isPlaying) return;
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            // Player movement
+            player.x += (mouse.x - player.x) * 0.1;
+            player.y += (mouse.y - player.y) * 0.1;
+
+            // Draw player
+            ctx.fillStyle = activeGame === 'neon' ? '#8b5cf6' : '#10b981';
+            ctx.beginPath(); ctx.arc(player.x, player.y, player.r, 0, Math.PI*2); ctx.fill();
+
+            // Spawning
+            if(activeGame === 'neon') {
+                if(Math.random() < 0.03) entities.push({type:'enemy', x:Math.random()*canvas.width, y:-20, vx:(Math.random()-0.5)*2, vy:2, r:15});
+            } else {
+                score++; scoreText.innerText = score;
+                if(Math.random() < 0.08) entities.push({type:'debris', x:Math.random()*canvas.width, y:-20, vx:0, vy:5, r:10 + Math.random()*20});
+            }
+
+            for(let i = entities.length-1; i>=0; i--) {
+                let e = entities[i];
+                e.x += e.vx; e.y += e.vy;
+                ctx.fillStyle = e.type === 'bullet' ? '#fbbf24' : (activeGame === 'neon' ? '#ef4444' : '#475569');
+                ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.fill();
+
+                if(e.y > canvas.height + 50) entities.splice(i, 1);
+                else {
+                    const d = Math.hypot(e.x-player.x, e.y-player.y);
+                    if((e.type === 'enemy' || e.type === 'debris') && d < e.r + player.r) {
+                        isPlaying = false;
+                        overlay.classList.remove('hidden');
+                        document.getElementById('overlay-title').innerText = "MISSION FAILED";
+                        document.getElementById('overlay-desc').innerText = `Final Score: ${score}`;
+                        if(activeGame === 'neon' && score > user.bestNeon) user.bestNeon = score;
+                        if(activeGame === 'runner' && score > user.bestRunner) user.bestRunner = score;
+                        localStorage.setItem('nexus_hub_user', JSON.stringify(user));
+                        updateAccountUI();
+                        return;
+                    }
+                    if(e.type === 'enemy') {
+                        entities.forEach((b, bi) => {
+                            if(b.type === 'bullet' && Math.hypot(e.x-b.x, e.y-b.y) < e.r + b.r) {
+                                score += 10; scoreText.innerText = score;
+                                entities.splice(i, 1); entities.splice(bi, 1);
+                            }
+                        });
+                    }
+                }
+            }
+            requestAnimationFrame(gameLoop);
+        }
+        updateAccountUI();
+    </script>
+</body>
+</html>
