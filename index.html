@@ -58,7 +58,7 @@
             <span id="active-game-title" class="heading-font text-violet-400 text-sm"></span>
             <button onclick="document.getElementById('game-frame').contentWindow.location.reload()" class="bg-slate-800 p-2 px-4 rounded-lg text-xs">Reload</button>
         </div>
-        <div class="flex-1"><iframe id="game-frame" allow="autoplay; fullscreen; keyboard"></iframe></div>
+        <div class="flex-1"><iframe id="game-frame" allow="autoplay; fullscreen; keyboard; geolocation; microphone; camera; midi; vr; accelerometer; gyroscope; payment; ambient-light-sensor; encrypted-media"></iframe></div>
     </div>
 
     <!-- MAIN NAV -->
@@ -194,6 +194,7 @@
             icon.classList.add('sync-anim');
             
             try {
+                // Using GitHub API to get file list
                 const response = await fetch(`https://api.github.com/repos/${REPO_TARGET}/contents/`);
                 if(!response.ok) throw new Error("Sync failed. Check connection.");
                 
@@ -202,18 +203,22 @@
                 const games = files
                     .filter(file => {
                         const name = file.name.toLowerCase();
-                        // Filter for HTML files but EXCLUDE index.html
                         return name.endsWith('.html') && name !== 'index.html';
                     })
-                    .map(file => ({
-                        id: file.sha,
-                        name: file.name.replace('.html', '').replace(/-/g, ' ').replace(/_/g, ' '),
-                        url: `https://raw.githubusercontent.com/${REPO_TARGET}/main/${file.path}`
-                    }));
+                    .map(file => {
+                        // FIX: Using jsDelivr as a proxy to bypass GitHub's "Refused to Connect" (X-Frame-Options) security
+                        // Format: https://cdn.jsdelivr.net/gh/user/repo@branch/file.html
+                        const cdnUrl = `https://cdn.jsdelivr.net/gh/${REPO_TARGET}@main/${file.path}`;
+                        return {
+                            id: file.sha,
+                            name: file.name.replace('.html', '').replace(/-/g, ' ').replace(/_/g, ' '),
+                            url: cdnUrl
+                        };
+                    });
 
                 installedGames = games;
                 localStorage.setItem('nexus_games', JSON.stringify(installedGames));
-                showModal("SYNC SUCCESS", `Found ${games.length} games in your repository (skipping index.html).`);
+                showModal("SYNC SUCCESS", `Found ${games.length} games. Security bypass active.`);
             } catch (err) {
                 showModal("SYNC ERROR", err.message);
             } finally {
