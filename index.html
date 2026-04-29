@@ -3,301 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Command</title>
+    <title>Nexus Command OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Fira+Code&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --accent: #8a2be2;
-            --bg-dark: #050508;
-            --glass: rgba(15, 15, 25, 0.7);
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: #e0e0e0;
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-        }
-
+        :root { --accent: #8a2be2; --bg-dark: #050508; --glass: rgba(15, 15, 25, 0.85); }
+        body { background-color: var(--bg-dark); color: #e0e0e0; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
         .mono { font-family: 'Fira Code', monospace; }
-
-        /* Animated Aura Background */
-        .aura {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(138, 43, 226, 0.15) 0%, rgba(0,0,0,0) 70%);
-            border-radius: 50%;
-            z-index: -1;
-            transition: all 1s ease;
-            filter: blur(80px);
-        }
-
-        .glass {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-        }
-
-        .sidebar-btn {
-            @apply p-4 mb-2 rounded-xl transition-all duration-300 flex items-center justify-center cursor-pointer;
-            color: #666;
-        }
-
-        .sidebar-btn:hover {
-            background: rgba(138, 43, 226, 0.2);
-            color: var(--accent);
-        }
-
-        .sidebar-btn.active {
-            background: rgba(138, 43, 226, 0.3);
-            color: white;
-            box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
-        }
-
-        .app-window {
-            display: none;
-            animation: slideUp 0.4s ease-out forwards;
-        }
-
-        .app-window.active {
-            display: flex;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        textarea {
-            background: transparent;
-            border: none;
-            outline: none;
-            resize: none;
-            color: #d1d1d1;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #8a2be2; border-radius: 10px; }
+        .glass { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .sidebar-btn { @apply p-4 mb-2 rounded-2xl transition-all duration-300 flex items-center justify-center cursor-pointer relative; color: #555; }
+        .sidebar-btn:hover { background: rgba(138, 43, 226, 0.15); color: var(--accent); }
+        .sidebar-btn.active { background: rgba(138, 43, 226, 0.25); color: white; box-shadow: 0 0 20px rgba(138, 43, 226, 0.3); }
+        .sidebar-btn.active::after { content: ''; position: absolute; left: 0; height: 20px; width: 4px; background: var(--accent); border-radius: 0 4px 4px 0; }
+        .app-window { display: none; animation: fadeIn 0.3s ease-out; }
+        .app-window.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .ghost-blur { filter: blur(40px) brightness(0.2); pointer-events: none; }
+        .terminal-line::before { content: "> "; color: var(--accent); }
     </style>
 </head>
 <body onload="init()">
 
-    <div id="aura1" class="aura top-[-10%] left-[-10%]"></div>
-    <div id="aura2" class="aura bottom-[-10%] right-[-10%]"></div>
-
-    <div class="flex h-screen w-screen p-4 gap-4">
+    <div id="main-container" class="flex h-screen w-screen p-5 gap-5 transition-all duration-500">
         
-        <!-- SIDEBAR NAVIGATION -->
-        <nav class="w-20 glass rounded-2xl flex flex-col items-center py-6 z-50">
-            <div class="mb-8">
-                <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50">
-                    <span class="orbitron font-bold text-white">N</span>
+        <!-- NAVIGATION SIDEBAR -->
+        <nav class="w-24 glass rounded-[2.5rem] flex flex-col items-center py-10 z-50">
+            <div class="mb-10 group cursor-pointer" onclick="switchTab('dashboard', this)">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition">
+                    <span class="orbitron font-bold text-white text-xl">N</span>
                 </div>
             </div>
 
-            <div class="sidebar-btn active" onclick="switchTab('dashboard', this)" title="Dashboard">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <div class="sidebar-btn active" onclick="switchTab('dashboard', this)" title="Terminal Dashboard">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
             </div>
 
-            <div class="sidebar-btn" onclick="switchTab('notes', this)" title="Notes">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <div class="sidebar-btn" onclick="switchTab('notes', this)" title="Secure Notes">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             </div>
 
-            <div class="sidebar-btn" onclick="switchTab('proxy', this)" title="Web Proxy">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <div class="sidebar-btn" onclick="switchTab('games', this); syncGames();" title="Archive Games">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             </div>
 
-            <hr class="w-8 border-gray-800 my-4">
+            <div class="sidebar-btn" onclick="switchTab('proxy', this)" title="Web Access">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            </div>
 
-            <a href="GamingHub_All-in-One.html" class="sidebar-btn" title="Main Hub">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-            </a>
-
-            <a href="games.html" class="sidebar-btn" title="Games Library">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-            </a>
-
-            <div class="mt-auto">
-                <div class="sidebar-btn text-red-500/70 hover:bg-red-500/20 hover:text-red-500" onclick="panic()" title="PANIC">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            <div class="mt-auto space-y-4">
+                <div class="sidebar-btn text-blue-400 hover:bg-blue-500/20" onclick="toggleGhost()" title="Ghost Mode (Blur All)">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </div>
+                <div class="sidebar-btn text-red-500/70 hover:bg-red-500/20" onclick="panic()" title="EMERGENCY PANIC">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
                 </div>
             </div>
         </nav>
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 relative">
+        <!-- MAIN APP DISPLAY -->
+        <main class="flex-1 glass rounded-[2.5rem] relative overflow-hidden flex flex-col">
             
-            <!-- DASHBOARD TAB -->
-            <div id="dashboard" class="app-window active flex-col gap-6 h-full p-8">
-                <header>
-                    <h1 class="orbitron text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-400">Nexus Command</h1>
-                    <p class="text-gray-500 mt-2">System Status: <span class="text-green-500">OPTIMIZED</span></p>
-                </header>
-
-                <div class="grid grid-cols-3 gap-6">
-                    <div class="glass p-6 rounded-2xl">
-                        <p class="text-xs text-purple-400 orbitron uppercase tracking-widest mb-2">Memory usage</p>
-                        <div class="flex items-end gap-2">
-                            <span class="text-3xl font-bold">3.2</span><span class="text-gray-500 pb-1">GB</span>
-                        </div>
-                    </div>
-                    <div class="glass p-6 rounded-2xl">
-                        <p class="text-xs text-purple-400 orbitron uppercase tracking-widest mb-2">Network latency</p>
-                        <div class="flex items-end gap-2">
-                            <span class="text-3xl font-bold">12</span><span class="text-gray-500 pb-1">ms</span>
-                        </div>
-                    </div>
-                    <div class="glass p-6 rounded-2xl flex flex-col justify-center">
-                        <p id="clock" class="text-3xl font-bold mono tracking-tighter text-center">00:00:00</p>
-                    </div>
+            <!-- TOP STATS BAR -->
+            <div class="w-full h-12 border-b border-white/5 flex items-center justify-between px-8 text-[10px] orbitron tracking-widest text-gray-500">
+                <div class="flex items-center gap-6">
+                    <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> CORE ACTIVE</span>
+                    <span id="sync-status">SYNC: STABLE</span>
                 </div>
+                <div id="clock-display">00:00:00</div>
+            </div>
 
-                <div class="flex-1 glass rounded-2xl p-8 flex items-center justify-center">
-                   <div class="text-center max-w-md">
-                        <div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                        <h2 class="text-xl font-semibold mb-2">Operational Background Mode</h2>
-                        <p class="text-gray-500 text-sm">All stealth modules are active. Press <kbd class="px-2 py-1 bg-gray-800 rounded">ALT+G</kbd> to quickly cloak this tab.</p>
-                   </div>
+            <!-- DASHBOARD / TERMINAL -->
+            <div id="dashboard" class="app-window active flex-col h-full p-10 mono">
+                <div class="flex-1 overflow-y-auto space-y-2 text-sm text-purple-400/80" id="terminal-out">
+                    <p class="text-white orbitron text-2xl mb-4">Nexus_Sovereign_OS [v4.0]</p>
+                    <p>Initializing secure environment...</p>
+                    <p>Fetching local encrypted vault...</p>
+                    <p class="text-green-500">Connection established. Welcome, Admin.</p>
+                    <p class="terminal-line">Type 'help' for available commands.</p>
+                </div>
+                <div class="mt-4 flex gap-3 items-center border-t border-white/5 pt-4">
+                    <span class="text-purple-500 font-bold">root@nexus:~$</span>
+                    <input id="term-input" type="text" class="bg-transparent border-none outline-none flex-1 text-white" autofocus onkeydown="handleCommand(event)">
                 </div>
             </div>
 
-            <!-- NOTES TAB -->
-            <div id="notes" class="app-window flex-col h-full glass rounded-2xl overflow-hidden">
-                <div class="flex h-full">
-                    <div class="w-64 border-r border-white/5 p-4 flex flex-col">
-                        <h3 class="orbitron text-xs text-purple-400 mb-4 tracking-widest">FILES</h3>
-                        <div id="noteList" class="flex-1 space-y-2 overflow-y-auto"></div>
-                        <button onclick="createNewNote()" class="mt-4 w-full py-2 bg-purple-600/20 border border-purple-500/30 rounded-lg text-xs hover:bg-purple-600/40 transition">NEW DOCUMENT</button>
+            <!-- NOTES SYSTEM -->
+            <div id="notes" class="app-window h-full flex">
+                <div class="w-72 border-r border-white/5 p-6 flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="orbitron text-xs">ARCHIVE</span>
+                        <button onclick="addNote()" class="text-purple-400 text-xl">+</button>
                     </div>
-                    <div class="flex-1 flex flex-col p-8">
-                        <input id="noteTitle" type="text" class="bg-transparent text-2xl font-bold mb-4 outline-none w-full" placeholder="Untitled Document">
-                        <textarea id="noteContent" class="flex-1 w-full text-lg leading-relaxed" placeholder="Start typing..."></textarea>
-                    </div>
+                    <div id="note-list" class="space-y-2 flex-1 overflow-y-auto"></div>
+                </div>
+                <div class="flex-1 p-10 flex flex-col">
+                    <input id="note-title" type="text" class="bg-transparent border-none outline-none text-3xl font-bold mb-6 orbitron" placeholder="Document Title">
+                    <textarea id="note-body" class="flex-1 bg-transparent border-none outline-none resize-none text-lg leading-relaxed text-gray-300" placeholder="Type here..."></textarea>
                 </div>
             </div>
 
-            <!-- PROXY TAB -->
-            <div id="proxy" class="app-window flex-col h-full glass rounded-2xl overflow-hidden">
-                <div class="p-3 bg-white/5 flex items-center gap-4">
-                    <div class="flex gap-2">
-                        <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-                        <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                        <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+            <!-- GAME ARCHIVE -->
+            <div id="games" class="app-window h-full flex-col p-10">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="orbitron text-2xl">Digital Archive</h2>
+                    <div class="flex gap-4">
+                        <input id="custom-url" type="text" placeholder="External URL..." class="bg-black/30 border border-white/10 px-4 py-1 rounded-lg text-xs outline-none">
+                        <button onclick="loadCustomGame()" class="bg-purple-600 px-4 py-1 rounded-lg text-xs">LAUNCH</button>
                     </div>
-                    <input id="proxyUrl" type="text" class="flex-1 bg-black/40 border border-white/10 px-4 py-1 rounded-full text-sm outline-none focus:border-purple-500" placeholder="Enter URL or search..." onkeydown="if(event.key==='Enter') loadProxy()">
-                    <button onclick="loadProxy()" class="text-purple-400 hover:text-white transition">GO</button>
                 </div>
-                <div class="flex-1 bg-white">
-                    <iframe id="proxyFrame" class="w-full h-full border-none" src="about:blank"></iframe>
+                <div id="game-grid" class="grid grid-cols-4 gap-4 overflow-y-auto"></div>
+                
+                <!-- GAME PLAYER OVERLAY -->
+                <div id="game-stage" class="hidden fixed inset-0 z-[100] bg-black flex flex-col">
+                    <div class="h-10 bg-zinc-900 flex justify-between items-center px-4">
+                        <span class="text-[10px] orbitron text-purple-400" id="current-game-name">SIMULATION RUNNING</span>
+                        <button onclick="closeGame()" class="text-red-500 orbitron text-[10px]">TERMINATE_PROCESS</button>
+                    </div>
+                    <iframe id="game-frame" class="flex-1 border-none bg-white" src=""></iframe>
                 </div>
+            </div>
+
+            <!-- PROXY BROWSER -->
+            <div id="proxy" class="app-window h-full flex-col">
+                <div class="p-4 border-b border-white/5 flex gap-4">
+                    <input id="proxy-in" type="text" class="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-2 text-sm outline-none focus:border-purple-500" placeholder="Navigate securely..." onkeydown="if(event.key==='Enter') startProxy()">
+                    <button onclick="startProxy()" class="bg-purple-600 px-8 rounded-full text-xs orbitron font-bold">GO</button>
+                </div>
+                <iframe id="proxy-view" class="flex-1 bg-white border-none" src="about:blank"></iframe>
             </div>
 
         </main>
+    </div>
 
-        <!-- STEALTH CONTROL BAR -->
-        <div class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 glass rounded-full z-[100]">
-            <button onclick="cloak()" class="text-xs orbitron hover:text-purple-400 transition">CLOAK TAB</button>
-            <div class="w-[1px] h-4 bg-white/10"></div>
-            <button onclick="panic()" class="text-xs orbitron text-red-400 hover:text-red-300 transition">FORCE PANIC</button>
-        </div>
-
+    <!-- QUICK CLOAK CONTROLS -->
+    <div class="fixed bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-6 px-10 py-4 glass rounded-full z-[200]">
+        <button onclick="cloak('history')" class="text-[10px] orbitron text-gray-500 hover:text-white transition">CLOAK_HISTORY</button>
+        <div class="w-1 h-1 rounded-full bg-white/20"></div>
+        <button onclick="cloak('docs')" class="text-[10px] orbitron text-gray-500 hover:text-white transition">CLOAK_DOCS</button>
+        <div class="w-[1px] h-4 bg-white/10"></div>
+        <button onclick="panic()" class="text-[10px] orbitron text-red-500 font-bold hover:scale-110 transition">PANIC_KILL_ALL</button>
     </div>
 
     <script>
-        let notes = JSON.parse(localStorage.getItem('nexus_notes')) || [{id: 1, title: 'Welcome', content: 'This is your secure workspace.'}];
-        let activeNoteId = 1;
+        const REPO = "YourUser/YourRepo"; // Set your github info here
+        let notes = JSON.parse(localStorage.getItem('nx_notes')) || [{id: 1, title: 'Startup Log', body: 'Nexus OS initialized...'}];
+        let activeNote = notes[0];
 
         function init() {
-            renderNoteList();
-            loadNote(1);
-            setInterval(updateClock, 1000);
+            renderNotes();
+            setInterval(() => {
+                document.getElementById('clock-display').textContent = new Date().toLocaleTimeString();
+            }, 1000);
+            // Feature: Auto-Save
+            setInterval(saveToLocal, 5000);
         }
 
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.app-window').forEach(win => win.classList.remove('active'));
-            document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
+        function switchTab(id, el) {
+            document.querySelectorAll('.app-window').forEach(w => w.classList.remove('active'));
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
             el.classList.add('active');
+        }
 
-            // Change Aura color
-            if(tabId === 'proxy') {
-                document.getElementById('aura1').style.background = 'radial-gradient(circle, rgba(66, 135, 245, 0.15) 0%, rgba(0,0,0,0) 70%)';
-            } else if(tabId === 'notes') {
-                document.getElementById('aura1').style.background = 'radial-gradient(circle, rgba(138, 43, 226, 0.15) 0%, rgba(0,0,0,0) 70%)';
-            } else {
-                document.getElementById('aura1').style.background = 'radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, rgba(0,0,0,0) 70%)';
+        function handleCommand(e) {
+            if(e.key === 'Enter') {
+                const cmd = e.target.value.toLowerCase();
+                const out = document.getElementById('terminal-out');
+                const p = document.createElement('p');
+                p.className = 'terminal-line text-white';
+                p.textContent = cmd;
+                out.appendChild(p);
+
+                // Feature: Terminal Logic
+                if(cmd === 'help') {
+                    const help = document.createElement('p');
+                    help.textContent = 'Available: notes, games, proxy, clear, cloak, panic';
+                    out.appendChild(help);
+                } else if(cmd === 'clear') {
+                    out.innerHTML = '';
+                } else if(['notes', 'games', 'proxy'].includes(cmd)) {
+                    switchTab(cmd, document.querySelector(`[title*="${cmd.charAt(0).toUpperCase()}"]`));
+                }
+                
+                e.target.value = '';
+                out.scrollTop = out.scrollHeight;
             }
         }
 
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour12: false });
-        }
-
-        // --- NOTES LOGIC ---
-        function renderNoteList() {
-            const list = document.getElementById('noteList');
-            list.innerHTML = notes.map(note => `
-                <div onclick="loadNote(${note.id})" class="p-3 rounded-lg cursor-pointer text-sm ${activeNoteId === note.id ? 'bg-purple-600/20 border border-purple-500/30' : 'hover:bg-white/5'}">
-                    <p class="truncate font-semibold">${note.title || 'Untitled'}</p>
-                    <p class="truncate text-[10px] text-gray-500">${note.content.substring(0, 20)}...</p>
+        function renderNotes() {
+            const list = document.getElementById('note-list');
+            list.innerHTML = notes.map(n => `
+                <div onclick="openNote(${n.id})" class="p-4 rounded-xl cursor-pointer transition ${activeNote.id === n.id ? 'bg-purple-600/30 border border-purple-500/50' : 'hover:bg-white/5'}">
+                    <p class="text-sm font-bold truncate">${n.title}</p>
+                    <p class="text-[10px] text-gray-500 truncate">${n.body.substring(0, 30)}</p>
                 </div>
             `).join('');
+            document.getElementById('note-title').value = activeNote.title;
+            document.getElementById('note-body').value = activeNote.body;
         }
 
-        function loadNote(id) {
-            activeNoteId = id;
-            const note = notes.find(n => n.id === id);
-            document.getElementById('noteTitle').value = note.title;
-            document.getElementById('noteContent').value = note.content;
-            renderNoteList();
+        function openNote(id) { activeNote = notes.find(n => n.id === id); renderNotes(); }
+
+        function saveToLocal() {
+            activeNote.title = document.getElementById('note-title').value;
+            activeNote.body = document.getElementById('note-body').value;
+            localStorage.setItem('nx_notes', JSON.stringify(notes));
+            document.getElementById('sync-status').textContent = "SYNC: UPDATED";
+            setTimeout(() => document.getElementById('sync-status').textContent = "SYNC: STABLE", 2000);
         }
 
-        document.getElementById('noteContent').addEventListener('input', saveNote);
-        document.getElementById('noteTitle').addEventListener('input', saveNote);
-
-        function saveNote() {
-            const note = notes.find(n => n.id === activeNoteId);
-            note.title = document.getElementById('noteTitle').value;
-            note.content = document.getElementById('noteContent').value;
-            localStorage.setItem('nexus_notes', JSON.stringify(notes));
-            renderNoteList();
+        async function syncGames() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '<p class="col-span-full text-center orbitron text-xs animate-pulse">Scanning Archive...</p>';
+            try {
+                const res = await fetch(`https://api.github.com/repos/${REPO}/contents/`);
+                const files = await res.json();
+                grid.innerHTML = files.filter(f => f.name.endsWith('.html') && f.name !== 'index.html').map(f => `
+                    <div onclick="launchGame('https://cdn.jsdelivr.net/gh/${REPO}@main/${f.path}', '${f.name}')" 
+                         class="glass p-6 rounded-2xl cursor-pointer hover:border-purple-500 transition group text-center">
+                        <div class="w-8 h-8 bg-white/5 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:bg-purple-600">
+                            <span class="text-[10px] text-white">G</span>
+                        </div>
+                        <p class="text-[10px] orbitron font-bold">${f.name.replace('.html', '').toUpperCase()}</p>
+                    </div>
+                `).join('');
+            } catch (e) { grid.innerHTML = 'Repository Connection Failed.'; }
         }
 
-        function createNewNote() {
-            const newId = Date.now();
-            notes.push({id: newId, title: 'New Note', content: ''});
-            loadNote(newId);
+        function launchGame(url, name) {
+            document.getElementById('game-stage').classList.remove('hidden');
+            document.getElementById('game-frame').src = url;
+            document.getElementById('current-game-name').textContent = `ACTIVE_SIM: ${name.toUpperCase()}`;
         }
 
-        // --- PROXY LOGIC ---
-        function loadProxy() {
-            let url = document.getElementById('proxyUrl').value;
-            if (!url.startsWith('http')) url = 'https://www.google.com/search?q=' + url;
-            // Using a simple workaround for framing. For true proxying, we'd use your specific backend.
-            document.getElementById('proxyFrame').src = url;
+        function loadCustomGame() {
+            const url = document.getElementById('custom-url').value;
+            if(url) launchGame(url, 'External');
         }
 
-        // --- STEALTH LOGIC ---
-        function panic() {
-            window.location.href = "https://www.google.com";
+        function closeGame() {
+            document.getElementById('game-stage').classList.add('hidden');
+            document.getElementById('game-frame').src = '';
         }
 
-        function cloak() {
-            document.title = "Class Notes - World History";
-            const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-            link.type = 'image/x-icon';
-            link.rel = 'shortcut icon';
-            link.href = 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico';
-            document.getElementsByTagName('head')[0].appendChild(link);
-            alert("Tab Cloaked. Title: Class Notes");
+        function startProxy() {
+            let url = document.getElementById('proxy-in').value;
+            if(!url.startsWith('http')) url = 'https://www.google.com/search?igu=1&q=' + url;
+            document.getElementById('proxy-view').src = url;
+        }
+
+        function toggleGhost() { document.getElementById('main-container').classList.toggle('ghost-blur'); }
+
+        function panic() { window.location.href = 'https://www.google.com'; }
+
+        function cloak(type) {
+            if(type === 'docs') {
+                document.title = "Class Notes - World History";
+                const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+                link.href = 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico';
+                document.head.appendChild(link);
+            } else {
+                document.title = "Google";
+                const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+                link.href = 'https://www.google.com/favicon.ico';
+                document.head.appendChild(link);
+            }
         }
     </script>
 </body>
