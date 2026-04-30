@@ -1,409 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Sovereign OS</title>
+    <title>Google Docs</title>
+    <link rel="icon" href="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Fira+Code&display=swap"
-        rel="stylesheet">
     <style>
-        :root {
-            --accent: #8a2be2;
-            --bg-dark: #020204;
-            --glass: rgba(10, 10, 18, 0.85);
+        :root { --accent: #3b82f6; }
+        body { margin: 0; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        
+        /* Desktop Wallpaper */
+        #wallpaper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1477346611705-65d1883cee1e?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+            background-size: cover; z-index: -1;
         }
 
-        body {
-            background-color: var(--bg-dark);
-            color: #e0e0e0;
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            margin: 0;
+        /* App Windows */
+        .window {
+            position: absolute; top: 100px; left: 150px; width: 700px; height: 450px;
+            background: rgba(15, 15, 20, 0.9); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 10;
         }
-
-        .orbitron {
-            font-family: 'Orbitron', sans-serif;
+        .win-header { padding: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; cursor: move; border-radius: 12px 12px 0 0; }
+        
+        /* The Proxy UI */
+        .proxy-container {
+            padding: 40px; text-align: center; color: white;
         }
-
-        .mono {
-            font-family: 'Fira Code', monospace;
+        .proxy-input {
+            width: 100%; max-width: 500px; background: #1a1a24; border: 1px solid #333;
+            padding: 12px 20px; border-radius: 30px; color: white; outline: none; transition: 0.3s;
         }
+        .proxy-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
 
-        .glass {
-            background: var(--glass);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 1);
+        /* Dock */
+        .dock {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(20px);
+            padding: 10px 20px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1);
+            display: flex; gap: 15px; align-items: center;
         }
+        .dock-app { width: 50px; height: 50px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .dock-app:hover { transform: scale(1.2) translateY(-10px); }
 
-        .sidebar-btn {
-            @apply p-6 mb-6 rounded-[2.2rem] transition-all duration-500 flex items-center justify-center cursor-pointer relative group;
-            color: #444;
+        .btn-glow {
+            background: var(--accent); color: white; padding: 10px 25px; border-radius: 20px;
+            font-weight: bold; font-size: 14px; transition: 0.3s; margin-top: 20px;
         }
-
-        .sidebar-btn:hover {
-            background: rgba(138, 43, 226, 0.12);
-            color: var(--accent);
-            transform: scale(1.05);
-        }
-
-        .sidebar-btn.active {
-            background: rgba(138, 43, 226, 0.2);
-            color: white;
-            box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
-        }
-
-        .sidebar-btn.active::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            height: 35px;
-            width: 4px;
-            background: var(--accent);
-            border-radius: 0 4px 4px 0;
-        }
-
-        .app-window {
-            display: none;
-            animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .app-window.active {
-            display: flex;
-        }
-
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.98) translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .game-card {
-            @apply relative overflow-hidden glass p-8 rounded-[3rem] cursor-pointer border border-white/5 hover:border-purple-500/40 transition-all duration-700 group;
-        }
-
-        .game-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            background: rgba(138, 43, 226, 0.08);
-        }
-
-        iframe {
-            border-radius: 40px;
-            background: white;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .sidebar-btn::before {
-            content: attr(data-title);
-            @apply absolute left-28 bg-purple-600 text-white text-[10px] px-4 py-1.5 rounded-md opacity-0 pointer-events-none transition-all duration-300 orbitron tracking-widest whitespace-nowrap z-[100];
-        }
-
-        .sidebar-btn:hover::before {
-            opacity: 1;
-            left: 32;
-        }
-
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(138, 43, 226, 0.2);
-            border-radius: 10px;
-        }
-
-        #main-ui {
-            transition: padding 0.5s ease, gap 0.5s ease;
-        }
-
-        .fullscreen #main-ui {
-            padding: 0 !important;
-            gap: 0 !important;
-        }
-
-        .proxy-loading-bar {
-            height: 2px;
-            width: 0%;
-            background: var(--accent);
-            transition: width 0.3s ease;
-        }
+        .btn-glow:hover { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); transform: translateY(-2px); }
     </style>
 </head>
+<body>
 
-<body onload="init()">
+    <div id="wallpaper"></div>
 
-    <div id="main-ui" class="flex h-screen w-screen p-10 gap-10 transition-all duration-500">
-
-        <nav class="w-32 glass rounded-[5rem] flex flex-col items-center py-16 z-50">
-            <div class="mb-20" onclick="switchTab('dashboard', this)">
-                <div
-                    class="w-20 h-20 bg-gradient-to-tr from-purple-600 to-indigo-700 rounded-[2.5rem] flex items-center justify-center shadow-2xl cursor-pointer hover:rotate-12 transition-transform duration-500">
-                    <span class="orbitron font-bold text-white text-3xl">NX</span>
-                </div>
+    <!-- WINDOW: WEB PROXY -->
+    <div id="win-proxy" class="window">
+        <div class="win-header" onmousedown="dragWin(this.parentElement)">
+            <div class="flex gap-2">
+                <div class="w-3 h-3 bg-red-500 rounded-full cursor-pointer" onclick="closeWin('win-proxy')"></div>
+                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+            </div>
+            <span class="ml-4 text-[10px] text-gray-400 uppercase tracking-tighter">Nexus Secure Bypass v4.0</span>
+        </div>
+        
+        <div class="proxy-container">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold mb-2">Web Engine</h1>
+                <p class="text-gray-500 text-xs">Routing via high-speed stealth nodes. Bypasses GoGuardian, Securly, and Fortinet.</p>
             </div>
 
-            <div class="sidebar-btn active" onclick="switchTab('dashboard', this)" data-title="TERMINAL_CORE">
-                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M4 17l6-6-6-6M12 19h8" />
-                </svg>
+            <input id="target-url" type="text" placeholder="Enter URL or Search Query..." class="proxy-input mb-4">
+            
+            <div class="flex flex-wrap justify-center gap-3">
+                <button onclick="launch('uv')" class="btn-glow">Ultraviolet Node</button>
+                <button onclick="launch('rh')" class="btn-glow bg-purple-600">Rammerhead Node</button>
             </div>
 
-            <div class="sidebar-btn" onclick="switchTab('games', this)" data-title="GAME_ARCHIVE">
-                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <rect x="2" y="6" width="20" height="12" rx="2" />
-                    <path d="M6 12h4M8 10v4M15 11h.01M18 13h.01" />
-                </svg>
-            </div>
-
-            <div class="sidebar-btn" onclick="switchTab('proxy', this)" data-title="SOVEREIGN_PROXY">
-                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" />
-                    <path
-                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                    <path d="M2 12h20" />
-                </svg>
-            </div>
-
-            <div class="mt-auto flex flex-col gap-6">
-                <div class="sidebar-btn text-blue-400 hover:bg-blue-500/20" onclick="launchAboutBlank()"
-                    data-title="CLOAK_MODE">
-                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
-                    </svg>
+            <div class="mt-8 grid grid-cols-4 gap-4">
+                <div class="p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10" onclick="quickLaunch('https://www.google.com')">
+                    <span class="block text-sm">Google</span>
                 </div>
-                <div class="sidebar-btn text-emerald-400 hover:bg-emerald-500/20" onclick="toggleFullScreen()"
-                    data-title="FULLSCREEN">
-                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path
-                            d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                    </svg>
+                <div class="p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10" onclick="quickLaunch('https://www.youtube.com')">
+                    <span class="block text-sm">YouTube</span>
                 </div>
-                <div class="sidebar-btn text-red-500/60 hover:bg-red-500/30" onclick="panic()" data-title="PANIC_EXIT">
-                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
+                <div class="p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10" onclick="quickLaunch('https://www.discord.com')">
+                    <span class="block text-sm">Discord</span>
+                </div>
+                <div class="p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10" onclick="quickLaunch('https://www.tiktok.com')">
+                    <span class="block text-sm">TikTok</span>
                 </div>
             </div>
-        </nav>
+        </div>
+    </div>
 
-        <main class="flex-1 glass rounded-[5rem] relative overflow-hidden flex flex-col">
-
-            <div
-                class="h-24 border-b border-white/5 flex items-center justify-between px-20 text-[12px] orbitron tracking-[0.4em] text-gray-500">
-                <div class="flex items-center gap-12">
-                    <span class="flex items-center gap-4"><span class="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.6)] animate-pulse"></span>
-                    SYSTEM_LIVE</span>
-                    <span id="proxy-status" class="opacity-60 text-purple-400">X-FRAME_BYPASS_ENGAGED</span>
-                </div>
-                <div class="flex items-center gap-8">
-                    <span id="clock" class="text-white/80 font-bold tracking-normal">00:00:00</span>
-                </div>
-            </div>
-
-            <!-- DASHBOARD -->
-            <div id="dashboard" class="app-window active flex-col h-full p-24 mono">
-                <div class="flex-1 overflow-y-auto space-y-6 text-lg text-purple-400/80" id="term-out">
-                    <p class="text-white orbitron text-7xl mb-12 font-bold tracking-tighter">Nexus Sovereign
-                        <span class="text-purple-600 font-normal">v5.2</span></p>
-                    <p>Internal Sovereign Tunnel: Active</p>
-                    <p class="text-emerald-500">Bypassing X-Frame-Options via Blob Hijacking.</p>
-                </div>
-                <div class="mt-16 flex gap-8 items-center border-t border-white/5 pt-12">
-                    <span class="text-purple-600 font-bold text-2xl">mickey@nexus:~$</span>
-                    <input id="term-in" type="text" class="bg-transparent border-none outline-none flex-1 text-white text-3xl" autofocus onkeydown="handleTerminal(event)">
-                </div>
-            </div>
-
-            <!-- GAMES -->
-            <div id="games" class="app-window h-full flex-col p-20 overflow-hidden">
-                <div class="flex items-center justify-between mb-20 px-6">
-                    <h2 class="orbitron text-6xl font-bold text-white">Archive</h2>
-                </div>
-                <div id="game-grid"
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 overflow-y-auto flex-1 pb-24 px-6">
-                </div>
-                <div id="game-stage" class="hidden absolute inset-0 z-[100] bg-black flex flex-col">
-                    <div class="h-24 bg-zinc-900 border-b border-white/5 flex items-center justify-between px-20">
-                        <span id="active-game-name" class="orbitron text-[12px] text-purple-500 font-bold tracking-widest">SESSION_ACTIVE</span>
-                        <button onclick="closeGame()" class="text-red-500 orbitron text-[11px] font-bold tracking-widest">CLOSE</button>
-                    </div>
-                    <iframe id="game-frame" src=""></iframe>
-                </div>
-            </div>
-
-            <!-- SOVEREIGN PROXY -->
-            <div id="proxy" class="app-window h-full flex-col">
-                <div class="p-10 border-b border-white/5 flex flex-col gap-4 bg-white/5">
-                    <div class="flex gap-8 items-center">
-                        <input id="proxy-url" type="text" class="flex-1 bg-black/50 border border-white/10 rounded-[3rem] px-12 py-6 text-xl outline-none focus:border-purple-500 transition-all font-light" placeholder="Bypass restricted URLs (e.g. discord.com)..." onkeydown="if(event.key==='Enter') launchProxy()">
-                        <button onclick="launchProxy()" class="bg-purple-600 px-12 py-6 rounded-[2.5rem] text-[13px] orbitron font-bold hover:bg-purple-500 shadow-2xl transition">BYPASS_LOAD</button>
-                    </div>
-                    <div class="proxy-loading-bar" id="load-progress"></div>
-                </div>
-                <div class="flex-1 relative bg-white">
-                    <!-- Bypass Guard if it still fails -->
-                    <div id="proxy-guard"
-                        class="hidden absolute inset-0 bg-slate-900 z-10 flex flex-col items-center justify-center p-20 text-center">
-                        <h3 class="orbitron text-2xl font-bold text-white mb-4">Header Conflict Detected</h3>
-                        <p class="text-gray-400 mb-12 max-w-lg">Strict CSP detected. Use Sovereign Cloak to isolate the
-                            site from this tab's security policy.</p>
-                        <button onclick="launchProxy(true)" class="bg-blue-600 px-12 py-6 rounded-full orbitron font-bold text-xs tracking-widest hover:bg-blue-500 transition">LAUNCH CLOAKED BYPASS</button>
-                    </div>
-                    <!-- The Sandbox Iframe -->
-                    <iframe id="proxy-frame"
-                        sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-scripts allow-same-origin"
-                        src="about:blank"></iframe>
-                </div>
-            </div>
-
-        </main>
+    <!-- DOCK -->
+    <div class="dock">
+        <div class="dock-app" onclick="openWin('win-proxy')" title="Web Browser">🌐</div>
+        <div class="dock-app" title="Files">📂</div>
+        <div class="dock-app" title="Settings">⚙️</div>
+        <div class="w-[1px] h-6 bg-white/20 mx-2"></div>
+        <div class="dock-app" onclick="panic()" title="Panic Button">🚨</div>
     </div>
 
     <script>
-        const FIXED_REPO = "ckuw82990-maker/coolguy";
+        // List of active public proxy mirrors
+        const UV_NODES = [
+            "https://science-asphalt.vercel.app/",
+            "https://t-800.info/",
+            "https://astroid.wtf/"
+        ];
 
-        function init() {
-            updateClock();
-            setInterval(updateClock, 1000);
-            syncRepository();
+        function openWin(id) {
+            const win = document.getElementById(id);
+            win.style.display = 'flex';
+            win.style.zIndex = "100";
         }
 
-        function updateClock() {
-            document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+        function closeWin(id) {
+            document.getElementById(id).style.display = 'none';
         }
 
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-                document.body.classList.add('fullscreen');
-            } else {
-                document.exitFullscreen();
-                document.body.classList.remove('fullscreen');
-            }
-        }
-
-        function switchTab(id, el) {
-            document.querySelectorAll('.app-window').forEach(w => w.classList.remove('active'));
-            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(el) el.classList.add('active');
-        }
-
-        function handleTerminal(e) {
-            if(e.key === 'Enter') {
-                const cmd = e.target.value.toLowerCase().trim();
-                if(cmd === 'proxy') switchTab('proxy', document.querySelector('[data-title="SOVEREIGN_PROXY"]'));
-                e.target.value = '';
-            }
-        }
-
-        async function syncRepository() {
-            const grid = document.getElementById('game-grid');
-            try {
-                const res = await fetch(`https://api.github.com/repos/${FIXED_REPO}/contents/`);
-                const files = await res.json();
-                const games = files.filter(f => f.name.endsWith('.html') && f.name !== 'index.html');
-                grid.innerHTML = games.map(f => `
-                    <div class="game-card" onclick="launchGame('https://cdn.jsdelivr.net/gh/${FIXED_REPO}@main/${f.path}', '${f.name}')">
-                        <h3 class="orbitron text-sm font-bold text-white mb-2">${f.name.replace('.html', '').toUpperCase()}</h3>
-                    </div>
-                `).join('');
-            } catch (err) {
-                grid.innerHTML = `<p class="orbitron text-xs text-red-500">SYNC_FAILED</p>`;
-            }
-        }
-
-        function launchGame(url, name) {
-            document.getElementById('game-stage').classList.remove('hidden');
-            document.getElementById('game-frame').src = url;
-        }
-
-        function closeGame() {
-            document.getElementById('game-stage').classList.add('hidden');
-            document.getElementById('game-frame').src = '';
-        }
-
-        /** SOVEREIGN BYPASS LOGIC **/
-        async function launchProxy(forceCloak = false) {
-            let input = document.getElementById('proxy-url').value;
-            if(!input) return;
-
-            let url = input;
-            if(!input.includes('.') || input.includes(' ')) {
-                url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
-            } else if (!input.startsWith('http')) {
-                url = 'https://' + input;
-            }
-
-            if(forceCloak) {
-                launchAboutBlank(url);
-                document.getElementById('proxy-guard').classList.add('hidden');
-                return;
-            }
-
-            const frame = document.getElementById('proxy-frame');
-            const guard = document.getElementById('proxy-guard');
-            const progress = document.getElementById('load-progress');
+        function launch(method) {
+            let url = document.getElementById('target-url').value;
+            if (!url) return;
             
-            guard.classList.add('hidden');
-            progress.style.width = "40%";
-
-            // The Bypass Attempt: Using fetch to pull content and inject into a blob
-            // This is the "Sovereign" way to bypass simple X-Frame checks if CORS allows
-            try {
-                // If the site blocks CORS, this will fail, falling back to direct load
-                const response = await fetch(url);
-                const text = await response.text();
-                const blob = new Blob([text], { type: 'text/html' });
-                frame.src = URL.createObjectURL(blob);
-                progress.style.width = "100%";
-                setTimeout(() => progress.style.width = "0%", 1000);
-            } catch (e) {
-                // If fetch fails (CORS), we attempt a direct load with strict sandboxing
-                // This often works for sites that only check for "top" window orientation
-                frame.src = url;
-                progress.style.width = "80%";
-                
-                // Show the cloak option as a backup after a short delay
-                setTimeout(() => {
-                    guard.classList.remove('hidden');
-                    progress.style.width = "0%";
-                }, 3000);
+            // Format URL
+            if (!url.startsWith('http')) {
+                if (url.includes('.')) {
+                    url = 'https://' + url;
+                } else {
+                    url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+                }
             }
-        }
 
-        function launchAboutBlank(url = window.location.href) {
+            // Pick a random node for load balancing
+            const node = UV_NODES[Math.floor(Math.random() * UV_NODES.length)];
+            const finalProxyUrl = node + "#" + btoa(url); // Most proxies use Base64 hashes
+
+            // STEALTH LAUNCH:
+            // We open it in a new window with a generic name to prevent history tracking
             const win = window.open('about:blank', '_blank');
-            if (!win) return;
-            win.document.title = "Google Docs";
-            const iframe = win.document.createElement('iframe');
-            iframe.style = "position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;";
-            iframe.src = url;
-            win.document.body.appendChild(iframe);
+            win.document.write(`
+                <title>Google Docs</title>
+                <body style="margin:0;padding:0;overflow:hidden;">
+                    <iframe src="${finalProxyUrl}" style="width:100%;height:100vh;border:none;"></iframe>
+                </body>
+            `);
         }
 
-        function panic() { window.location.href = "https://classroom.google.com"; }
-        
-        function cloak(mode) {
-            document.title = mode === 'history' ? "Assignment - World History" : "Google";
+        function quickLaunch(url) {
+            document.getElementById('target-url').value = url;
+            launch('uv');
+        }
+
+        function panic() {
+            window.location.replace("https://www.google.com");
+        }
+
+        // Draggable Function
+        function dragWin(el) {
+            let p1 = 0, p2 = 0, p3 = 0, p4 = 0;
+            el.onmousedown = (e) => {
+                p3 = e.clientX; p4 = e.clientY;
+                document.onmouseup = () => { document.onmouseup = null; document.onmousemove = null; };
+                document.onmousemove = (e) => {
+                    p1 = p3 - e.clientX; p2 = p4 - e.clientY;
+                    p3 = e.clientX; p4 = e.clientY;
+                    el.style.top = (el.offsetTop - p2) + "px";
+                    el.style.left = (el.offsetLeft - p1) + "px";
+                };
+            }
         }
     </script>
 </body>
-
 </html>
