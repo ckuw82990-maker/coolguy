@@ -20,10 +20,10 @@
             box-shadow: 0 25px 80px rgba(0,0,0,1); 
         }
         
-        .sidebar-btn { @apply p-5 mb-5 rounded-[2rem] transition-all duration-500 flex items-center justify-center cursor-pointer relative group; color: #444; }
+        .sidebar-btn { @apply p-6 mb-6 rounded-[2.2rem] transition-all duration-500 flex items-center justify-center cursor-pointer relative group; color: #444; }
         .sidebar-btn:hover { background: rgba(138, 43, 226, 0.12); color: var(--accent); transform: scale(1.05); }
         .sidebar-btn.active { background: rgba(138, 43, 226, 0.2); color: white; box-shadow: 0 0 30px rgba(138, 43, 226, 0.2); }
-        .sidebar-btn.active::after { content: ''; position: absolute; left: 0; height: 30px; width: 4px; background: var(--accent); border-radius: 0 4px 4px 0; }
+        .sidebar-btn.active::after { content: ''; position: absolute; left: 0; height: 35px; width: 4px; background: var(--accent); border-radius: 0 4px 4px 0; }
         
         .app-window { display: none; animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         .app-window.active { display: flex; }
@@ -33,7 +33,7 @@
             to { opacity: 1; transform: scale(1) translateY(0); } 
         }
 
-        .game-card { @apply relative overflow-hidden glass p-6 rounded-[2.5rem] cursor-pointer border border-white/5 hover:border-purple-500/40 transition-all duration-700 group; }
+        .game-card { @apply relative overflow-hidden glass p-8 rounded-[3rem] cursor-pointer border border-white/5 hover:border-purple-500/40 transition-all duration-700 group; }
         .game-card:hover { transform: translateY(-10px) scale(1.02); background: rgba(138, 43, 226, 0.08); }
 
         iframe { border-radius: 40px; background: white; }
@@ -41,118 +41,104 @@
         /* Tooltip mimic */
         .sidebar-btn::before {
             content: attr(data-title);
-            @apply absolute left-24 bg-purple-600 text-white text-[10px] px-3 py-1 rounded-md opacity-0 pointer-events-none transition-all duration-300 orbitron;
+            @apply absolute left-28 bg-purple-600 text-white text-[10px] px-4 py-1.5 rounded-md opacity-0 pointer-events-none transition-all duration-300 orbitron tracking-widest whitespace-nowrap z-[100];
         }
-        .sidebar-btn:hover::before { opacity: 1; left: 28; }
+        .sidebar-btn:hover::before { opacity: 1; left: 32; }
 
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(138, 43, 226, 0.2); border-radius: 10px; }
         
-        #main-container { height: 100%; transition: padding 0.5s ease; }
-        .fullscreen #main-container { padding: 0 !important; gap: 0 !important; }
-        .fullscreen nav { border-radius: 0; }
+        #main-ui { transition: padding 0.5s ease, gap 0.5s ease; }
+        .fullscreen #main-ui { padding: 0 !important; gap: 0 !important; }
+        .fullscreen nav { border-radius: 0; border: none; }
         .fullscreen main { border-radius: 0; border: none; }
     </style>
 </head>
 <body onload="init()">
 
-    <div id="main-ui" class="flex h-screen w-screen p-8 gap-8 transition-all duration-500">
+    <div id="main-ui" class="flex h-screen w-screen p-10 gap-10 transition-all duration-500">
         
-        <nav class="w-28 glass rounded-[4rem] flex flex-col items-center py-12 z-50">
-            <div class="mb-14" onclick="switchTab('dashboard', this)">
-                <div class="w-16 h-16 bg-gradient-to-tr from-purple-600 to-indigo-700 rounded-[2rem] flex items-center justify-center shadow-2xl cursor-pointer hover:rotate-12 transition-transform duration-500">
-                    <span class="orbitron font-bold text-white text-2xl">NX</span>
+        <nav class="w-32 glass rounded-[5rem] flex flex-col items-center py-16 z-50">
+            <div class="mb-20" onclick="switchTab('dashboard', this)">
+                <div class="w-20 h-20 bg-gradient-to-tr from-purple-600 to-indigo-700 rounded-[2.5rem] flex items-center justify-center shadow-2xl cursor-pointer hover:rotate-12 transition-transform duration-500">
+                    <span class="orbitron font-bold text-white text-3xl">NX</span>
                 </div>
             </div>
 
-            <div class="sidebar-btn active" onclick="switchTab('dashboard', this)" data-title="TERMINAL">
-                <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
-            </div>
-
-            <div class="sidebar-btn" onclick="switchTab('notes', this)" data-title="SECURE_NOTES">
-                <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            <div class="sidebar-btn active" onclick="switchTab('dashboard', this)" data-title="TERMINAL_CORE">
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
             </div>
 
             <div class="sidebar-btn" onclick="switchTab('games', this)" data-title="GAME_ARCHIVE">
-                <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"/></svg>
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"/></svg>
             </div>
 
             <div class="sidebar-btn" onclick="switchTab('proxy', this)" data-title="GHOST_BROWSER">
-                <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
             </div>
 
-            <div class="mt-auto flex flex-col gap-5">
-                <div class="sidebar-btn text-blue-400 hover:bg-blue-500/20" onclick="launchAboutBlank()" data-title="AB_BLANK_CLOAK">
-                    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+            <div class="mt-auto flex flex-col gap-6">
+                <div class="sidebar-btn text-blue-400 hover:bg-blue-500/20" onclick="launchAboutBlank()" data-title="CLOAK_MODE">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
                 </div>
                 <div class="sidebar-btn text-emerald-400 hover:bg-emerald-500/20" onclick="toggleFullScreen()" data-title="FULLSCREEN">
-                    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                 </div>
-                <div class="sidebar-btn text-red-500/60 hover:bg-red-500/30" onclick="panic()" data-title="PANIC_KILL">
-                    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                <div class="sidebar-btn text-red-500/60 hover:bg-red-500/30" onclick="panic()" data-title="PANIC_EXIT">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </div>
             </div>
         </nav>
 
-        <main class="flex-1 glass rounded-[4rem] relative overflow-hidden flex flex-col">
+        <main class="flex-1 glass rounded-[5rem] relative overflow-hidden flex flex-col">
             
-            <div class="h-20 border-b border-white/5 flex items-center justify-between px-16 text-[11px] orbitron tracking-[0.3em] text-gray-500">
-                <div class="flex items-center gap-10">
-                    <span class="flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)] animate-pulse"></span> SYSTEM_LIVE</span>
+            <div class="h-24 border-b border-white/5 flex items-center justify-between px-20 text-[12px] orbitron tracking-[0.4em] text-gray-500">
+                <div class="flex items-center gap-12">
+                    <span class="flex items-center gap-4"><span class="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.6)] animate-pulse"></span> SYSTEM_LIVE</span>
                     <span id="repo-status" class="opacity-60">REPO: ckuw82990-maker/coolguy</span>
                 </div>
-                <div class="flex items-center gap-6">
-                    <span id="clock" class="text-white/80 font-bold">00:00:00</span>
+                <div class="flex items-center gap-8">
+                    <span id="clock" class="text-white/80 font-bold tracking-normal">00:00:00</span>
                 </div>
             </div>
 
             <!-- DASHBOARD -->
-            <div id="dashboard" class="app-window active flex-col h-full p-20 mono">
-                <div class="flex-1 overflow-y-auto space-y-4 text-base text-purple-400/80" id="term-out">
-                    <p class="text-white orbitron text-5xl mb-8 font-bold tracking-tighter">Nexus Sovereign <span class="text-purple-600 font-normal">v4.6</span></p>
-                    <p>Core systems active. Latency: 12ms.</p>
-                    <p>Screen optimization applied: Dynamic Spacing enabled.</p>
+            <div id="dashboard" class="app-window active flex-col h-full p-24 mono">
+                <div class="flex-1 overflow-y-auto space-y-6 text-lg text-purple-400/80" id="term-out">
+                    <p class="text-white orbitron text-7xl mb-12 font-bold tracking-tighter">Nexus Sovereign <span class="text-purple-600 font-normal">v4.7</span></p>
+                    <p>Modular cleanup complete: [Notes] removed from kernel.</p>
+                    <p>Screen optimization: 100% Spacious Scaling.</p>
                     <p class="text-blue-400">Environment synced: ckuw82990-maker/coolguy</p>
-                    <p class="text-emerald-500">Session Secure. Welcome back, Mickey.</p>
+                    <p class="text-emerald-500">Secure link established. Ready for input.</p>
                 </div>
-                <div class="mt-12 flex gap-6 items-center border-t border-white/5 pt-10">
-                    <span class="text-purple-600 font-bold text-xl">mickey@nexus:~$</span>
-                    <input id="term-in" type="text" class="bg-transparent border-none outline-none flex-1 text-white text-2xl" autofocus onkeydown="handleTerminal(event)">
+                <div class="mt-16 flex gap-8 items-center border-t border-white/5 pt-12">
+                    <span class="text-purple-600 font-bold text-2xl">mickey@nexus:~$</span>
+                    <input id="term-in" type="text" class="bg-transparent border-none outline-none flex-1 text-white text-3xl" autofocus onkeydown="handleTerminal(event)">
                 </div>
-            </div>
-
-            <!-- NOTES -->
-            <div id="notes" class="app-window h-full flex flex-col p-24 max-w-6xl mx-auto w-full">
-                <div class="flex justify-between items-center mb-10">
-                    <span class="orbitron text-[11px] text-gray-500 tracking-widest">ENCRYPTED_ENTRY</span>
-                    <button onclick="newNote()" class="text-[11px] orbitron text-purple-400 hover:text-white transition-all bg-white/5 px-6 py-2 rounded-full border border-white/5">NEW_PROCESS</button>
-                </div>
-                <input id="note-title" type="text" class="bg-transparent border-none outline-none text-6xl font-bold mb-12 orbitron tracking-tight text-white placeholder:text-white/10" placeholder="Title" oninput="saveActiveNote()">
-                <textarea id="note-body" class="flex-1 bg-transparent border-none outline-none resize-none text-2xl leading-[1.8] text-gray-400 scroll-smooth placeholder:text-gray-700" placeholder="Transcription source..." oninput="saveActiveNote()"></textarea>
             </div>
 
             <!-- GAMES -->
-            <div id="games" class="app-window h-full flex-col p-16 overflow-hidden">
-                <div class="flex items-center justify-between mb-16 px-4">
+            <div id="games" class="app-window h-full flex-col p-20 overflow-hidden">
+                <div class="flex items-center justify-between mb-20 px-6">
                     <div>
-                        <h2 class="orbitron text-5xl font-bold mb-3 tracking-tighter">Archive</h2>
-                        <p class="text-[11px] text-gray-500 orbitron tracking-[0.2em]">REMOTE_REPOSITORY_ASSETS</p>
+                        <h2 class="orbitron text-6xl font-bold mb-4 tracking-tighter text-white">Archive</h2>
+                        <p class="text-[12px] text-gray-500 orbitron tracking-[0.3em]">REMOTE_CDN_ASSETS</p>
                     </div>
-                    <div class="flex gap-4 bg-white/5 p-3 rounded-3xl border border-white/5">
-                        <input id="repo-input" type="text" placeholder="username/repository" class="bg-transparent text-sm px-6 py-3 outline-none w-64 border-r border-white/10" value="ckuw82990-maker/coolguy">
-                        <button onclick="syncRepository()" class="px-10 py-3 bg-purple-600 rounded-2xl text-[11px] orbitron font-bold hover:bg-purple-500 transition shadow-lg">SYNC_NODE</button>
+                    <div class="flex gap-6 bg-white/5 p-4 rounded-[2.5rem] border border-white/5">
+                        <input id="repo-input" type="text" placeholder="username/repository" class="bg-transparent text-base px-8 py-4 outline-none w-80 border-r border-white/10" value="ckuw82990-maker/coolguy">
+                        <button onclick="syncRepository()" class="px-12 py-4 bg-purple-600 rounded-[1.8rem] text-[12px] orbitron font-bold hover:bg-purple-500 transition shadow-2xl">SYNC_NODE</button>
                     </div>
                 </div>
-                <div id="game-grid" class="grid grid-cols-4 gap-10 overflow-y-auto flex-1 pb-20 px-4">
+                <div id="game-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 overflow-y-auto flex-1 pb-24 px-6">
                     <!-- Loaded via JS -->
                 </div>
                 <div id="game-stage" class="hidden absolute inset-0 z-[100] bg-black flex flex-col">
-                    <div class="h-20 bg-zinc-900 border-b border-white/5 flex items-center justify-between px-16">
-                        <span id="active-game-name" class="orbitron text-[11px] text-purple-500 font-bold">SESSION_ID_404</span>
-                        <div class="flex gap-8">
-                            <button onclick="toggleGameFullScreen()" class="text-white/40 orbitron text-[10px] hover:text-white transition">TOGGLE_MAX</button>
-                            <button onclick="closeGame()" class="text-red-500 orbitron text-[10px] font-bold">TERM_PROCESS</button>
+                    <div class="h-24 bg-zinc-900 border-b border-white/5 flex items-center justify-between px-20">
+                        <span id="active-game-name" class="orbitron text-[12px] text-purple-500 font-bold tracking-widest">SESSION_ACTIVE</span>
+                        <div class="flex gap-10">
+                            <button onclick="toggleGameFullScreen()" class="text-white/40 orbitron text-[11px] hover:text-white transition tracking-widest">FULLSCREEN</button>
+                            <button onclick="closeGame()" class="text-red-500 orbitron text-[11px] font-bold tracking-widest">KILL_THREAD</button>
                         </div>
                     </div>
                     <iframe id="game-frame" class="flex-1 w-full h-full border-none" src=""></iframe>
@@ -161,10 +147,10 @@
 
             <!-- GHOST PROXY -->
             <div id="proxy" class="app-window h-full flex-col">
-                <div class="p-8 border-b border-white/5 flex gap-6 bg-white/5 items-center">
-                    <input id="proxy-url" type="text" class="flex-1 bg-black/50 border border-white/10 rounded-[2rem] px-10 py-5 text-lg outline-none focus:border-purple-500 transition-all font-light" placeholder="Secure Proxy Tunnel..." onkeydown="if(event.key==='Enter') launchProxy()">
-                    <button onclick="launchProxy()" class="bg-purple-600 px-10 py-5 rounded-[1.8rem] text-[12px] orbitron font-bold hover:bg-purple-500 shadow-xl transition">CONNECT</button>
-                    <button onclick="launchAboutBlank()" class="bg-blue-600/10 text-blue-400 px-10 py-5 rounded-[1.8rem] text-[12px] orbitron font-bold border border-blue-500/20 hover:bg-blue-600/20 transition">CLOAK_TAB</button>
+                <div class="p-10 border-b border-white/5 flex gap-8 bg-white/5 items-center">
+                    <input id="proxy-url" type="text" class="flex-1 bg-black/50 border border-white/10 rounded-[3rem] px-12 py-6 text-xl outline-none focus:border-purple-500 transition-all font-light" placeholder="Secure Proxy Tunnel..." onkeydown="if(event.key==='Enter') launchProxy()">
+                    <button onclick="launchProxy()" class="bg-purple-600 px-12 py-6 rounded-[2.5rem] text-[13px] orbitron font-bold hover:bg-purple-500 shadow-2xl transition">CONNECT</button>
+                    <button onclick="launchAboutBlank()" class="bg-blue-600/10 text-blue-400 px-12 py-6 rounded-[2.5rem] text-[13px] orbitron font-bold border border-blue-500/20 hover:bg-blue-600/20 transition">CLOAK_TAB</button>
                 </div>
                 <iframe id="proxy-frame" class="flex-1 w-full h-full border-none bg-white" src="about:blank"></iframe>
             </div>
@@ -173,20 +159,17 @@
     </div>
 
     <!-- FLOATING PANIC OVERLAY -->
-    <div id="panic-bar" class="fixed bottom-14 left-1/2 -translate-x-1/2 flex items-center gap-12 px-16 py-7 glass rounded-full z-[200] opacity-30 hover:opacity-100 transition-all duration-500">
-        <button onclick="cloak('history')" class="text-[11px] orbitron text-gray-500 hover:text-white transition tracking-widest">CLOAK:HISTORY</button>
-        <button onclick="cloak('google')" class="text-[11px] orbitron text-gray-500 hover:text-white transition tracking-widest">CLOAK:SEARCH</button>
-        <div class="w-[1px] h-8 bg-white/10"></div>
-        <button onclick="panic()" class="text-[11px] orbitron text-red-500 font-bold animate-pulse tracking-widest">EMERGENCY_KILL</button>
+    <div id="panic-bar" class="fixed bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-14 px-20 py-8 glass rounded-full z-[200] opacity-30 hover:opacity-100 transition-all duration-500 scale-110">
+        <button onclick="cloak('history')" class="text-[11px] orbitron text-gray-500 hover:text-white transition tracking-[0.2em]">CLOAK:HISTORY</button>
+        <button onclick="cloak('google')" class="text-[11px] orbitron text-gray-500 hover:text-white transition tracking-[0.2em]">CLOAK:SEARCH</button>
+        <div class="w-[1px] h-10 bg-white/10"></div>
+        <button onclick="panic()" class="text-[11px] orbitron text-red-500 font-bold animate-pulse tracking-[0.2em]">EMERGENCY_KILL</button>
     </div>
 
     <script>
-        let notes = JSON.parse(localStorage.getItem('nx_notes')) || [{id: Date.now(), title: 'Nexus Operating Log', body: 'Spacious layout v4.6 applied. All modules responsive.'}];
-        let activeNote = notes[0];
         let savedRepo = localStorage.getItem('nx_repo') || "ckuw82990-maker/coolguy";
 
         function init() {
-            renderActiveNote();
             updateClock();
             setInterval(updateClock, 1000);
             if(savedRepo) {
@@ -194,7 +177,6 @@
                 syncRepository();
             }
             
-            // Listen for full screen exit
             document.addEventListener('fullscreenchange', () => {
                 if (!document.fullscreenElement) {
                     document.body.classList.remove('fullscreen');
@@ -209,7 +191,7 @@
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => {
-                    console.log(`Error attempting to enable full-screen mode: ${err.message}`);
+                    console.log(`Fullscreen error: ${err.message}`);
                 });
                 document.body.classList.add('fullscreen');
             } else {
@@ -233,13 +215,7 @@
         function launchAboutBlank() {
             const url = window.location.href;
             const win = window.open('about:blank', '_blank');
-            if (!win) {
-                const line = document.createElement('p');
-                line.className = "text-red-500";
-                line.textContent = "Error: Popup blocked. Enable popups for About:Blank cloak.";
-                document.getElementById('term-out').appendChild(line);
-                return;
-            }
+            if (!win) return;
             win.document.title = "Google Docs";
             win.document.body.style.margin = '0';
             win.document.body.style.height = '100vh';
@@ -262,11 +238,7 @@
                 out.appendChild(line);
 
                 if(cmd === 'help') {
-                    out.innerHTML += `<p class="text-gray-500">notes, games, proxy, clear, sync [repo], ab-blank, panic, fullscreen</p>`;
-                } else if(cmd === 'ab-blank') {
-                    launchAboutBlank();
-                } else if(cmd === 'fullscreen' || cmd === 'fs') {
-                    toggleFullScreen();
+                    out.innerHTML += `<p class="text-gray-500">games, proxy, clear, sync [repo], ab-blank, panic, fullscreen</p>`;
                 } else if(cmd === 'clear') {
                     out.innerHTML = '';
                 } else if(cmd.startsWith('sync ')) {
@@ -279,31 +251,11 @@
             }
         }
 
-        function renderActiveNote() {
-            document.getElementById('note-title').value = activeNote.title;
-            document.getElementById('note-body').value = activeNote.body;
-        }
-
-        function newNote() {
-            const n = { id: Date.now(), title: 'UntitledEntry', body: '' };
-            notes.unshift(n);
-            activeNote = n;
-            renderActiveNote();
-        }
-
-        function saveActiveNote() {
-            activeNote.title = document.getElementById('note-title').value;
-            activeNote.body = document.getElementById('note-body').value;
-            const index = notes.findIndex(n => n.id === activeNote.id);
-            if(index !== -1) notes[index] = activeNote;
-            localStorage.setItem('nx_notes', JSON.stringify(notes));
-        }
-
         async function syncRepository() {
             const repoPath = document.getElementById('repo-input').value.trim() || "ckuw82990-maker/coolguy";
             const grid = document.getElementById('game-grid');
             const status = document.getElementById('repo-status');
-            grid.innerHTML = '<div class="col-span-4 text-center py-40 animate-pulse orbitron text-sm text-purple-400">CONNECTING_TO_CDN...</div>';
+            grid.innerHTML = '<div class="col-span-full text-center py-60 animate-pulse orbitron text-base text-purple-400 tracking-widest">INITIALIZING_REMOTE_HANDSHAKE...</div>';
             
             try {
                 const res = await fetch(`https://api.github.com/repos/${repoPath}/contents/`);
@@ -313,15 +265,15 @@
                 const games = files.filter(f => f.name.endsWith('.html') && f.name !== 'index.html');
                 
                 if (games.length === 0) {
-                    grid.innerHTML = `<div class="col-span-4 text-center py-40 text-gray-500 orbitron text-sm">NO_COMPATIBLE_ASSETS_IN_${repoPath}</div>`;
+                    grid.innerHTML = `<div class="col-span-full text-center py-60 text-gray-500 orbitron text-base tracking-widest">NO_ASSETS_FOUND_IN_${repoPath}</div>`;
                 } else {
                     grid.innerHTML = games.map(f => `
                         <div class="game-card" onclick="launchGame('https://cdn.jsdelivr.net/gh/${repoPath}@main/${f.path}', '${f.name}')">
-                            <div class="w-14 h-14 bg-purple-600/10 rounded-2xl mb-6 flex items-center justify-center border border-purple-500/10">
-                                <svg width="28" height="28" fill="white" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            <div class="w-20 h-20 bg-purple-600/10 rounded-3xl mb-8 flex items-center justify-center border border-purple-500/10 group-hover:bg-purple-600 group-hover:shadow-[0_0_30px_rgba(138,43,226,0.5)] transition-all duration-500">
+                                <svg width="36" height="36" fill="white" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                             </div>
-                            <h3 class="orbitron text-[12px] font-bold text-white mb-2">${f.name.replace('.html', '').toUpperCase()}</h3>
-                            <p class="text-[9px] text-purple-500 font-bold opacity-60">LOAD_VIA_JSDELIVR</p>
+                            <h3 class="orbitron text-base font-bold text-white mb-3 tracking-tight">${f.name.replace('.html', '').toUpperCase()}</h3>
+                            <p class="text-[10px] text-purple-500 font-bold opacity-60 orbitron tracking-widest">SECURE_LOAD_ACTIVE</p>
                         </div>
                     `).join('');
                 }
@@ -330,7 +282,7 @@
                 status.className = "text-green-500 opacity-100";
                 localStorage.setItem('nx_repo', repoPath);
             } catch (err) {
-                grid.innerHTML = `<div class="col-span-4 text-center py-40 text-red-500 orbitron text-sm">ACCESS_ERROR: ${err.message}</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-60 text-red-500 orbitron text-base tracking-widest">SYNC_FAILURE: ${err.message}</div>`;
                 status.textContent = "REPO: DISCONNECTED";
                 status.className = "text-red-500 opacity-100";
             }
