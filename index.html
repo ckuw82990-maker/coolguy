@@ -3,160 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Command OS</title>
+    <title>Nexus Sovereign OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Fira+Code&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #8a2be2; --bg-dark: #050508; --glass: rgba(15, 15, 25, 0.85); }
-        body { background-color: var(--bg-dark); color: #e0e0e0; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        :root { --accent: #8a2be2; --bg-dark: #050508; --glass: rgba(15, 15, 25, 0.9); }
+        body { background-color: var(--bg-dark); color: #e0e0e0; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
         .mono { font-family: 'Fira Code', monospace; }
-        .glass { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        .sidebar-btn { @apply p-4 mb-2 rounded-2xl transition-all duration-300 flex items-center justify-center cursor-pointer relative; color: #555; }
+        .glass { background: var(--glass); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 50px rgba(0,0,0,0.9); }
+        
+        .sidebar-btn { @apply p-4 mb-3 rounded-2xl transition-all duration-300 flex items-center justify-center cursor-pointer relative; color: #555; }
         .sidebar-btn:hover { background: rgba(138, 43, 226, 0.15); color: var(--accent); }
         .sidebar-btn.active { background: rgba(138, 43, 226, 0.25); color: white; box-shadow: 0 0 20px rgba(138, 43, 226, 0.3); }
-        .sidebar-btn.active::after { content: ''; position: absolute; left: 0; height: 20px; width: 4px; background: var(--accent); border-radius: 0 4px 4px 0; }
-        .app-window { display: none; animation: fadeIn 0.3s ease-out; }
+        .sidebar-btn.active::after { content: ''; position: absolute; left: 0; height: 24px; width: 4px; background: var(--accent); border-radius: 0 4px 4px 0; }
+        
+        .app-window { display: none; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .app-window.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-        .ghost-blur { filter: blur(40px) brightness(0.2); pointer-events: none; }
-        .terminal-line::before { content: "> "; color: var(--accent); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .game-card { @apply relative overflow-hidden glass p-4 rounded-2xl cursor-pointer border border-white/5 hover:border-purple-500/50 transition-all duration-500 group; }
+        .game-card:hover { transform: translateY(-5px); background: rgba(138, 43, 226, 0.05); }
+
+        .ghost-blur { filter: blur(50px) brightness(0.3); pointer-events: none; transition: 0.5s; }
+        
+        iframe { border-radius: 20px; background: white; }
     </style>
 </head>
 <body onload="init()">
 
-    <div id="main-container" class="flex h-screen w-screen p-5 gap-5 transition-all duration-500">
+    <div id="main-ui" class="flex h-screen w-screen p-5 gap-5">
         
-        <!-- NAVIGATION SIDEBAR -->
-        <nav class="w-24 glass rounded-[2.5rem] flex flex-col items-center py-10 z-50">
-            <div class="mb-10 group cursor-pointer" onclick="switchTab('dashboard', this)">
-                <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition">
-                    <span class="orbitron font-bold text-white text-xl">N</span>
+        <!-- ULTRA STEALTH SIDEBAR -->
+        <nav class="w-24 glass rounded-[3rem] flex flex-col items-center py-10 z-50">
+            <div class="mb-10" onclick="switchTab('dashboard', this)">
+                <div class="w-14 h-14 bg-gradient-to-tr from-purple-600 to-blue-600 rounded-[1.5rem] flex items-center justify-center shadow-2xl cursor-pointer hover:rotate-12 transition-transform">
+                    <span class="orbitron font-bold text-white text-2xl">NX</span>
                 </div>
             </div>
 
-            <div class="sidebar-btn active" onclick="switchTab('dashboard', this)" title="Terminal Dashboard">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            <div class="sidebar-btn active" onclick="switchTab('dashboard', this)" title="Terminal">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
             </div>
 
             <div class="sidebar-btn" onclick="switchTab('notes', this)" title="Secure Notes">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
             </div>
 
-            <div class="sidebar-btn" onclick="switchTab('games', this); syncGames();" title="Archive Games">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            <div class="sidebar-btn" onclick="switchTab('games', this)" title="Game Archive">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"/></svg>
             </div>
 
-            <div class="sidebar-btn" onclick="switchTab('proxy', this)" title="Web Access">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <div class="sidebar-btn" onclick="switchTab('proxy', this)" title="Ghost Browser">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             </div>
 
-            <div class="mt-auto space-y-4">
-                <div class="sidebar-btn text-blue-400 hover:bg-blue-500/20" onclick="toggleGhost()" title="Ghost Mode (Blur All)">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <div class="mt-auto flex flex-col gap-4">
+                <div class="sidebar-btn text-blue-400 hover:bg-blue-500/20" onclick="toggleGhost()" title="Ghost Mode">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </div>
-                <div class="sidebar-btn text-red-500/70 hover:bg-red-500/20" onclick="panic()" title="EMERGENCY PANIC">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                <div class="sidebar-btn text-red-500/70 hover:bg-red-500/30" onclick="panic()" title="Panic Button">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </div>
             </div>
         </nav>
 
-        <!-- MAIN APP DISPLAY -->
-        <main class="flex-1 glass rounded-[2.5rem] relative overflow-hidden flex flex-col">
+        <!-- MAIN OS CANVAS -->
+        <main class="flex-1 glass rounded-[3rem] relative overflow-hidden flex flex-col">
             
-            <!-- TOP STATS BAR -->
-            <div class="w-full h-12 border-b border-white/5 flex items-center justify-between px-8 text-[10px] orbitron tracking-widest text-gray-500">
-                <div class="flex items-center gap-6">
-                    <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> CORE ACTIVE</span>
-                    <span id="sync-status">SYNC: STABLE</span>
+            <!-- HEADER STATUS -->
+            <div class="h-14 border-b border-white/5 flex items-center justify-between px-10 text-[10px] orbitron tracking-[0.2em] text-gray-500">
+                <div class="flex items-center gap-8">
+                    <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> SYSTEM_LIVE</span>
+                    <span id="repo-status">REPO: NOT_CONNECTED</span>
                 </div>
-                <div id="clock-display">00:00:00</div>
+                <div class="flex items-center gap-4">
+                    <span id="clock">00:00:00</span>
+                </div>
             </div>
 
             <!-- DASHBOARD / TERMINAL -->
-            <div id="dashboard" class="app-window active flex-col h-full p-10 mono">
-                <div class="flex-1 overflow-y-auto space-y-2 text-sm text-purple-400/80" id="terminal-out">
-                    <p class="text-white orbitron text-2xl mb-4">Nexus_Sovereign_OS [v4.0]</p>
-                    <p>Initializing secure environment...</p>
-                    <p>Fetching local encrypted vault...</p>
-                    <p class="text-green-500">Connection established. Welcome, Admin.</p>
-                    <p class="terminal-line">Type 'help' for available commands.</p>
+            <div id="dashboard" class="app-window active flex-col h-full p-12 mono">
+                <div class="flex-1 overflow-y-auto space-y-2 text-sm text-purple-400" id="term-out">
+                    <p class="text-white orbitron text-3xl mb-4 tracking-tighter">Nexus Sovereign [Version 4.2.0]</p>
+                    <p>Core systems operational...</p>
+                    <p>Encrypted local storage loaded...</p>
+                    <p class="text-green-500">Welcome, Mickey. The system is ready.</p>
                 </div>
-                <div class="mt-4 flex gap-3 items-center border-t border-white/5 pt-4">
-                    <span class="text-purple-500 font-bold">root@nexus:~$</span>
-                    <input id="term-input" type="text" class="bg-transparent border-none outline-none flex-1 text-white" autofocus onkeydown="handleCommand(event)">
+                <div class="mt-8 flex gap-4 items-center border-t border-white/10 pt-6">
+                    <span class="text-purple-500 font-bold">mickey@nexus:~$</span>
+                    <input id="term-in" type="text" class="bg-transparent border-none outline-none flex-1 text-white text-lg" autofocus onkeydown="handleTerminal(event)">
                 </div>
             </div>
 
             <!-- NOTES SYSTEM -->
             <div id="notes" class="app-window h-full flex">
-                <div class="w-72 border-r border-white/5 p-6 flex flex-col">
-                    <div class="flex justify-between items-center mb-6">
-                        <span class="orbitron text-xs">ARCHIVE</span>
-                        <button onclick="addNote()" class="text-purple-400 text-xl">+</button>
+                <div class="w-80 border-r border-white/5 p-8 flex flex-col">
+                    <div class="flex justify-between items-center mb-8">
+                        <span class="orbitron text-xs text-gray-500 tracking-widest">ENCRYPTED_VAULT</span>
+                        <button onclick="newNote()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-purple-600 transition">+</button>
                     </div>
-                    <div id="note-list" class="space-y-2 flex-1 overflow-y-auto"></div>
+                    <div id="note-list" class="space-y-3 overflow-y-auto flex-1"></div>
                 </div>
-                <div class="flex-1 p-10 flex flex-col">
-                    <input id="note-title" type="text" class="bg-transparent border-none outline-none text-3xl font-bold mb-6 orbitron" placeholder="Document Title">
-                    <textarea id="note-body" class="flex-1 bg-transparent border-none outline-none resize-none text-lg leading-relaxed text-gray-300" placeholder="Type here..."></textarea>
+                <div class="flex-1 p-12 flex flex-col">
+                    <input id="note-title" type="text" class="bg-transparent border-none outline-none text-4xl font-bold mb-8 orbitron tracking-tight" placeholder="Entry Title" oninput="saveActiveNote()">
+                    <textarea id="note-body" class="flex-1 bg-transparent border-none outline-none resize-none text-xl leading-relaxed text-gray-400" placeholder="Secure entry data..." oninput="saveActiveNote()"></textarea>
                 </div>
             </div>
 
-            <!-- GAME ARCHIVE -->
-            <div id="games" class="app-window h-full flex-col p-10">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="orbitron text-2xl">Digital Archive</h2>
-                    <div class="flex gap-4">
-                        <input id="custom-url" type="text" placeholder="External URL..." class="bg-black/30 border border-white/10 px-4 py-1 rounded-lg text-xs outline-none">
-                        <button onclick="loadCustomGame()" class="bg-purple-600 px-4 py-1 rounded-lg text-xs">LAUNCH</button>
+            <!-- GAMES / REPOSITORY SYNC -->
+            <div id="games" class="app-window h-full flex-col p-10 overflow-hidden">
+                <div class="flex items-center justify-between mb-10">
+                    <div>
+                        <h2 class="orbitron text-3xl font-bold mb-2">Game Archive</h2>
+                        <p class="text-[10px] text-gray-500 orbitron">SYNC_TO_RESPIRATORY_ENGINE</p>
+                    </div>
+                    <div class="flex gap-3 bg-white/5 p-2 rounded-2xl border border-white/5">
+                        <input id="repo-input" type="text" placeholder="username/repository" class="bg-transparent text-xs px-4 py-2 outline-none w-48 border-r border-white/10" value="">
+                        <button onclick="syncRepository()" class="px-6 py-2 bg-purple-600 rounded-xl text-[10px] orbitron font-bold hover:bg-purple-500 transition">SYNC</button>
                     </div>
                 </div>
-                <div id="game-grid" class="grid grid-cols-4 gap-4 overflow-y-auto"></div>
-                
-                <!-- GAME PLAYER OVERLAY -->
-                <div id="game-stage" class="hidden fixed inset-0 z-[100] bg-black flex flex-col">
-                    <div class="h-10 bg-zinc-900 flex justify-between items-center px-4">
-                        <span class="text-[10px] orbitron text-purple-400" id="current-game-name">SIMULATION RUNNING</span>
-                        <button onclick="closeGame()" class="text-red-500 orbitron text-[10px]">TERMINATE_PROCESS</button>
+
+                <div id="game-grid" class="grid grid-cols-4 gap-6 overflow-y-auto flex-1 pb-10">
+                    <!-- Placeholder -->
+                    <div class="col-span-4 py-20 text-center opacity-30 border-2 border-dashed border-white/10 rounded-3xl">
+                        <p class="orbitron text-xs">Enter a repository above to sync your library.</p>
                     </div>
-                    <iframe id="game-frame" class="flex-1 border-none bg-white" src=""></iframe>
+                </div>
+
+                <!-- FULLSCREEN GAME STAGE -->
+                <div id="game-stage" class="hidden absolute inset-0 z-[100] bg-black flex flex-col animate-fadeIn">
+                    <div class="h-14 bg-zinc-900 border-b border-white/5 flex items-center justify-between px-10">
+                        <span id="active-game-name" class="orbitron text-[10px] text-purple-400">SESSION_ACTIVE</span>
+                        <div class="flex gap-4">
+                            <button onclick="toggleGhost()" class="text-blue-400 orbitron text-[10px]">GHOST_MODE</button>
+                            <button onclick="closeGame()" class="text-red-500 orbitron text-[10px]">TERMINATE_PROCESS</button>
+                        </div>
+                    </div>
+                    <iframe id="game-frame" class="flex-1 w-full h-full border-none" src=""></iframe>
                 </div>
             </div>
 
-            <!-- PROXY BROWSER -->
+            <!-- GHOST PROXY -->
             <div id="proxy" class="app-window h-full flex-col">
-                <div class="p-4 border-b border-white/5 flex gap-4">
-                    <input id="proxy-in" type="text" class="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-2 text-sm outline-none focus:border-purple-500" placeholder="Navigate securely..." onkeydown="if(event.key==='Enter') startProxy()">
-                    <button onclick="startProxy()" class="bg-purple-600 px-8 rounded-full text-xs orbitron font-bold">GO</button>
+                <div class="p-6 border-b border-white/5 flex gap-4 bg-white/20">
+                    <input id="proxy-url" type="text" class="flex-1 bg-black/40 border border-white/10 rounded-2xl px-6 py-3 text-sm outline-none focus:border-purple-500 transition" placeholder="Search or enter secure URL..." onkeydown="if(event.key==='Enter') launchProxy()">
+                    <button onclick="launchProxy()" class="bg-purple-600 px-10 rounded-2xl text-[10px] orbitron font-bold">LOAD</button>
                 </div>
-                <iframe id="proxy-view" class="flex-1 bg-white border-none" src="about:blank"></iframe>
+                <iframe id="proxy-frame" class="flex-1 w-full h-full border-none bg-white" src="about:blank"></iframe>
             </div>
 
         </main>
     </div>
 
-    <!-- QUICK CLOAK CONTROLS -->
-    <div class="fixed bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-6 px-10 py-4 glass rounded-full z-[200]">
+    <!-- QUICK CLOAK FOOTER -->
+    <div class="fixed bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-8 px-12 py-5 glass rounded-full z-[200]">
         <button onclick="cloak('history')" class="text-[10px] orbitron text-gray-500 hover:text-white transition">CLOAK_HISTORY</button>
-        <div class="w-1 h-1 rounded-full bg-white/20"></div>
-        <button onclick="cloak('docs')" class="text-[10px] orbitron text-gray-500 hover:text-white transition">CLOAK_DOCS</button>
-        <div class="w-[1px] h-4 bg-white/10"></div>
-        <button onclick="panic()" class="text-[10px] orbitron text-red-500 font-bold hover:scale-110 transition">PANIC_KILL_ALL</button>
+        <button onclick="cloak('google')" class="text-[10px] orbitron text-gray-500 hover:text-white transition">CLOAK_GOOGLE</button>
+        <div class="w-[1px] h-6 bg-white/10"></div>
+        <button onclick="panic()" class="text-[10px] orbitron text-red-500 font-bold animate-pulse">PANIC_KILL</button>
     </div>
 
     <script>
-        const REPO = "YourUser/YourRepo"; // Set your github info here
-        let notes = JSON.parse(localStorage.getItem('nx_notes')) || [{id: 1, title: 'Startup Log', body: 'Nexus OS initialized...'}];
+        let notes = JSON.parse(localStorage.getItem('nx_notes')) || [{id: Date.now(), title: 'Nexus Startup', body: 'System online...'}];
         let activeNote = notes[0];
+        let savedRepo = localStorage.getItem('nx_repo') || "";
 
         function init() {
             renderNotes();
-            setInterval(() => {
-                document.getElementById('clock-display').textContent = new Date().toLocaleTimeString();
-            }, 1000);
-            // Feature: Auto-Save
-            setInterval(saveToLocal, 5000);
+            updateClock();
+            setInterval(updateClock, 1000);
+            if(savedRepo) {
+                document.getElementById('repo-input').value = savedRepo;
+                syncRepository();
+            }
+        }
+
+        function updateClock() {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
         }
 
         function switchTab(id, el) {
@@ -166,36 +190,40 @@
             el.classList.add('active');
         }
 
-        function handleCommand(e) {
+        // --- TERMINAL LOGIC ---
+        function handleTerminal(e) {
             if(e.key === 'Enter') {
-                const cmd = e.target.value.toLowerCase();
-                const out = document.getElementById('terminal-out');
-                const p = document.createElement('p');
-                p.className = 'terminal-line text-white';
-                p.textContent = cmd;
-                out.appendChild(p);
+                const cmd = e.target.value.toLowerCase().trim();
+                const out = document.getElementById('term-out');
+                const line = document.createElement('p');
+                line.innerHTML = `<span class="text-white">></span> ${cmd}`;
+                out.appendChild(line);
 
-                // Feature: Terminal Logic
                 if(cmd === 'help') {
-                    const help = document.createElement('p');
-                    help.textContent = 'Available: notes, games, proxy, clear, cloak, panic';
-                    out.appendChild(help);
+                    out.innerHTML += `<p class="text-gray-500">Commands: notes, games, proxy, clear, sync [repo], panic</p>`;
                 } else if(cmd === 'clear') {
                     out.innerHTML = '';
-                } else if(['notes', 'games', 'proxy'].includes(cmd)) {
-                    switchTab(cmd, document.querySelector(`[title*="${cmd.charAt(0).toUpperCase()}"]`));
+                } else if(cmd === 'notes') {
+                    switchTab('notes', document.querySelector('[title="Secure Notes"]'));
+                } else if(cmd === 'games') {
+                    switchTab('games', document.querySelector('[title="Game Archive"]'));
+                } else if(cmd.startsWith('sync ')) {
+                    const r = cmd.split(' ')[1];
+                    document.getElementById('repo-input').value = r;
+                    syncRepository();
                 }
-                
+
                 e.target.value = '';
                 out.scrollTop = out.scrollHeight;
             }
         }
 
+        // --- NOTES LOGIC ---
         function renderNotes() {
             const list = document.getElementById('note-list');
             list.innerHTML = notes.map(n => `
-                <div onclick="openNote(${n.id})" class="p-4 rounded-xl cursor-pointer transition ${activeNote.id === n.id ? 'bg-purple-600/30 border border-purple-500/50' : 'hover:bg-white/5'}">
-                    <p class="text-sm font-bold truncate">${n.title}</p>
+                <div onclick="selectNote(${n.id})" class="p-5 rounded-2xl cursor-pointer transition ${activeNote.id === n.id ? 'bg-purple-600/30 border border-purple-500/50' : 'hover:bg-white/5 border border-transparent'}">
+                    <p class="text-xs font-bold truncate mb-1">${n.title || 'Untitled'}</p>
                     <p class="text-[10px] text-gray-500 truncate">${n.body.substring(0, 30)}</p>
                 </div>
             `).join('');
@@ -203,43 +231,67 @@
             document.getElementById('note-body').value = activeNote.body;
         }
 
-        function openNote(id) { activeNote = notes.find(n => n.id === id); renderNotes(); }
+        function selectNote(id) {
+            activeNote = notes.find(n => n.id === id);
+            renderNotes();
+        }
 
-        function saveToLocal() {
+        function newNote() {
+            const n = { id: Date.now(), title: 'New Entry', body: '' };
+            notes.unshift(n);
+            activeNote = n;
+            renderNotes();
+        }
+
+        function saveActiveNote() {
             activeNote.title = document.getElementById('note-title').value;
             activeNote.body = document.getElementById('note-body').value;
             localStorage.setItem('nx_notes', JSON.stringify(notes));
-            document.getElementById('sync-status').textContent = "SYNC: UPDATED";
-            setTimeout(() => document.getElementById('sync-status').textContent = "SYNC: STABLE", 2000);
+            renderNotes();
         }
 
-        async function syncGames() {
+        // --- REPOSITORY SYNC LOGIC ---
+        async function syncRepository() {
+            const repoPath = document.getElementById('repo-input').value.trim();
+            if(!repoPath) return;
+
             const grid = document.getElementById('game-grid');
-            grid.innerHTML = '<p class="col-span-full text-center orbitron text-xs animate-pulse">Scanning Archive...</p>';
+            const status = document.getElementById('repo-status');
+            
+            grid.innerHTML = '<div class="col-span-4 text-center py-20 animate-pulse orbitron text-xs">Connecting to Repository Host...</div>';
+            
             try {
-                const res = await fetch(`https://api.github.com/repos/${REPO}/contents/`);
+                const res = await fetch(`https://api.github.com/repos/${repoPath}/contents/`);
+                if(!res.ok) throw new Error("Invalid Repo");
+                
                 const files = await res.json();
-                grid.innerHTML = files.filter(f => f.name.endsWith('.html') && f.name !== 'index.html').map(f => `
-                    <div onclick="launchGame('https://cdn.jsdelivr.net/gh/${REPO}@main/${f.path}', '${f.name}')" 
-                         class="glass p-6 rounded-2xl cursor-pointer hover:border-purple-500 transition group text-center">
-                        <div class="w-8 h-8 bg-white/5 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:bg-purple-600">
-                            <span class="text-[10px] text-white">G</span>
+                const games = files.filter(f => f.name.endsWith('.html') && f.name !== 'index.html');
+                
+                grid.innerHTML = games.map(f => `
+                    <div class="game-card" onclick="launchGame('https://cdn.jsdelivr.net/gh/${repoPath}@main/${f.path}', '${f.name}')">
+                        <div class="w-10 h-10 bg-purple-600/20 rounded-xl mb-4 flex items-center justify-center">
+                            <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                         </div>
-                        <p class="text-[10px] orbitron font-bold">${f.name.replace('.html', '').toUpperCase()}</p>
+                        <h3 class="orbitron text-[10px] font-bold text-white mb-1">${f.name.replace('.html', '').toUpperCase()}</h3>
+                        <p class="text-[9px] text-gray-500">SECURE_CONTENT_HOSTED</p>
                     </div>
                 `).join('');
-            } catch (e) { grid.innerHTML = 'Repository Connection Failed.'; }
+
+                status.textContent = `REPO: ${repoPath.toUpperCase()}`;
+                status.classList.replace('text-gray-500', 'text-green-500');
+                localStorage.setItem('nx_repo', repoPath);
+
+            } catch (err) {
+                grid.innerHTML = `<div class="col-span-4 text-center py-20 text-red-500 orbitron text-xs">Sync Failed: ${err.message}</div>`;
+                status.textContent = "REPO: SYNC_ERROR";
+                status.classList.replace('text-green-500', 'text-red-500');
+            }
         }
 
         function launchGame(url, name) {
             document.getElementById('game-stage').classList.remove('hidden');
             document.getElementById('game-frame').src = url;
-            document.getElementById('current-game-name').textContent = `ACTIVE_SIM: ${name.toUpperCase()}`;
-        }
-
-        function loadCustomGame() {
-            const url = document.getElementById('custom-url').value;
-            if(url) launchGame(url, 'External');
+            document.getElementById('active-game-name').textContent = `PROCESS_ID: ${name.toUpperCase()}`;
         }
 
         function closeGame() {
@@ -247,18 +299,18 @@
             document.getElementById('game-frame').src = '';
         }
 
-        function startProxy() {
-            let url = document.getElementById('proxy-in').value;
+        function launchProxy() {
+            let url = document.getElementById('proxy-url').value;
             if(!url.startsWith('http')) url = 'https://www.google.com/search?igu=1&q=' + url;
-            document.getElementById('proxy-view').src = url;
+            document.getElementById('proxy-frame').src = url;
         }
 
-        function toggleGhost() { document.getElementById('main-container').classList.toggle('ghost-blur'); }
-
-        function panic() { window.location.href = 'https://www.google.com'; }
-
-        function cloak(type) {
-            if(type === 'docs') {
+        // --- STEALTH UTILS ---
+        function toggleGhost() { document.getElementById('main-ui').classList.toggle('ghost-blur'); }
+        function panic() { window.location.href = "https://www.google.com"; }
+        
+        function cloak(mode) {
+            if(mode === 'history') {
                 document.title = "Class Notes - World History";
                 const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
                 link.href = 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico';
